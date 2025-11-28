@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "GoDad",
+    "slug": "godad",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "godad",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fef7f0"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.godad.app"
+    },
+    "android": {
+      "usesCleartextTraffic": true,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#e76f51"
+      },
+      "package": "com.godad.app",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "允许 GoDad 访问您的相册",
+          "cameraPermission": "允许 GoDad 访问您的相机"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "apiBaseUrl": "http://192.168.140.229:8888",
+      "appVersion": "1.0.0",
+      "appName": "GoDad"
+    }
+  }
+}

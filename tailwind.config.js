@@ -1,0 +1,138 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+  ],
+  presets: [require("nativewind/preset")],
+  theme: {
+    extend: {
+      colors: {
+        // GoDad 主题色彩系统
+        primary: {
+          50: '#fef7f0',
+          100: '#fdeee0',
+          200: '#fbd9bf',
+          300: '#f8c194',
+          400: '#f4a261',
+          500: '#e76f51', // 主色调：温暖橙红色
+          600: '#d85a3c',
+          700: '#b84a32',
+          800: '#943d30',
+          900: '#78342c',
+        },
+        secondary: {
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6', // 辅助色：温和青绿色
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+        },
+        warm: {
+          50: '#fffbf5',
+          100: '#fff7ed',
+          200: '#feedc7',
+          300: '#fdedd3',
+          400: '#fcd9b6',
+          500: '#fdba74',
+          600: '#f59e0b',
+          700: '#d97706',
+          800: '#b45309',
+          900: '#92400e',
+        },
+        soft: {
+          50: '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#52525b',
+          700: '#3f3f46',
+          800: '#27272a',
+          900: '#18181b',
+        },
+        // 育婴主题色彩系统
+        'baby-blue': {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+        },
+        'baby-pink': {
+          50: '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6',
+          500: '#ec4899',
+          600: '#db2777',
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
+        },
+        'mint-green': {
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#22c55e',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+        },
+        cream: {
+          50: '#fffef7',
+          100: '#fffbeb',
+          200: '#fef3c7',
+          300: '#fde68a',
+          400: '#fcd34d',
+          500: '#fbbf24',
+          600: '#f59e0b',
+          700: '#d97706',
+          800: '#b45309',
+          900: '#92400e',
+        }
+      },
+      fontFamily: {
+        sans: ['System', 'sans-serif'],
+      },
+      boxShadow: {
+        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        'soft-lg': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.06)',
+        'gentle': '0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1)',
+        'warm': '0 4px 6px -1px rgba(231, 111, 81, 0.1), 0 2px 4px -1px rgba(231, 111, 81, 0.06)',
+        'pink': '0 4px 15px -3px rgba(236, 72, 153, 0.2), 0 2px 6px -2px rgba(236, 72, 153, 0.1)',
+        'pink-lg': '0 8px 25px -5px rgba(236, 72, 153, 0.25), 0 4px 12px -2px rgba(236, 72, 153, 0.15)',
+        'blue': '0 4px 15px -3px rgba(14, 165, 233, 0.2), 0 2px 6px -2px rgba(14, 165, 233, 0.1)',
+        'card': '0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.06)',
+        'card-hover': '0 8px 30px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.08)',
+      },
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
+        '4xl': '2.5rem',
+      },
+      // 背景色 - 用于页面渐变
+      backgroundColor: {
+        'page': '#fdfbf9',
+        'page-pink': '#fdf8f6',
+      }
+    },
+  },
+  plugins: [],
+};
