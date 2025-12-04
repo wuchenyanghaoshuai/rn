@@ -21,7 +21,7 @@
       "usesCleartextTraffic": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#e76f51"
+        "backgroundColor": "#fef7f0"
       },
       "package": "com.godad.app",
       "edgeToEdgeEnabled": true

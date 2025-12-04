@@ -1,14 +1,22 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 五行起名工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Sparkles, Circle, Info } from 'lucide-react-native';
+import { Input, Button, GradientCard, Radio } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface FiveElementsResult {
   element: string;
@@ -117,174 +125,176 @@ export default function FiveElementsNamingScreen() {
 
   const getElementAnalysis = (element: string) => {
     const analyses: Record<string, string> = {
-      金: '金代表坚毅、果断、正义。金命之人往往意志坚定，做事果断，有领导才能。',
-      木: '木代表仁慈、正直、成长。木命之人通常善良温和，富有同情心，善于成长进步。',
-      水: '水代表智慧、灵活、包容。水命之人聪明机智，善于变通，心胸宽广。',
-      火: '火代表热情、积极、光明。火命之人热情洋溢，积极向上，富有感染力。',
-      土: '土代表稳重、诚信、包容。土命之人踏实可靠，诚实守信，有责任心。',
+      金: '金代表坚毅、果断、正义。金命之人往往意志坚定,做事果断,有领导才能。',
+      木: '木代表仁慈、正直、成长。木命之人通常善良温和,富有同情心,善于成长进步。',
+      水: '水代表智慧、灵活、包容。水命之人聪明机智,善于变通,心胸宽广。',
+      火: '火代表热情、积极、光明。火命之人热情洋溢,积极向上,富有感染力。',
+      土: '土代表稳重、诚信、包容。土命之人踏实可靠,诚实守信,有责任心。',
     };
     return analyses[element] || '';
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '五行起名' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '五行起名',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 五行介绍 */}
-          <View className="bg-gradient-to-r from-purple-500 to-indigo-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">五行起名</Text>
-            <Text className="text-white/80 mt-2 leading-5">
-              根据出生年份计算五行属性，结合五行相生相克原理，为宝宝选择五行平衡的好名字。
+          <GradientCard variant="lavender" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <Circle size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">五行起名</Text>
+            </View>
+            <Text className="text-neutral-700 leading-5">
+              根据出生年份计算五行属性,结合五行相生相克原理,为宝宝选择五行平衡的好名字。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
+          <GradientCard variant="white" className="p-5 mb-5">
             {/* 性别选择 */}
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Text className={gender === 'male' ? 'text-white' : 'text-gray-600'}>
-                    男宝
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Text className={gender === 'female' ? 'text-white' : 'text-gray-600'}>
-                    女宝
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={gender === 'male'}
+                  onSelect={() => setGender('male')}
+                  label="男宝"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={gender === 'female'}
+                  onSelect={() => setGender('female')}
+                  label="女宝"
+                  className="flex-1"
+                />
               </View>
             </View>
 
             {/* 姓氏输入 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">姓氏</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入姓氏"
-                placeholderTextColor="#9ca3af"
-                value={surname}
-                onChangeText={setSurname}
-                maxLength={2}
-              />
-            </View>
+            <Input
+              label="姓氏"
+              placeholder="请输入姓氏"
+              value={surname}
+              onChangeText={setSurname}
+              maxLength={2}
+              className="mb-4"
+            />
 
             {/* 出生年份 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">出生年份</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="如：2024"
-                placeholderTextColor="#9ca3af"
-                value={birthYear}
-                onChangeText={setBirthYear}
-                keyboardType="number-pad"
-                maxLength={4}
-              />
-            </View>
+            <Input
+              label="出生年份"
+              placeholder="如：2024"
+              value={birthYear}
+              onChangeText={setBirthYear}
+              keyboardType="number-pad"
+              maxLength={4}
+              className="mb-5"
+            />
 
-            <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center"
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               onPress={generate}
+              icon={<Sparkles size={20} color="white" />}
             >
-              <Text className="text-white font-semibold text-lg">开始起名</Text>
-            </TouchableOpacity>
-          </View>
+              开始起名
+            </Button>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && (
             <>
               {/* 五行分析 */}
-              <View className="mt-6 bg-white rounded-2xl p-4 shadow-sm">
+              <GradientCard variant="lavender" className="p-5 mb-5">
                 <View className="flex-row items-center mb-4">
-                  <Ionicons name="planet-outline" size={24} color="#8b5cf6" />
-                  <Text className="text-gray-800 font-bold ml-2 text-lg">五行分析</Text>
+                  <Circle size={24} color={Colors.neutral[700]} />
+                  <Text className="text-neutral-800 font-bold ml-2 text-base">五行分析</Text>
                 </View>
 
-                <View className="bg-purple-50 rounded-xl p-4 mb-4">
-                  <Text className="text-purple-700 font-bold text-xl text-center">
+                <View className="bg-white/60 rounded-xl p-4 mb-4">
+                  <Text className="text-neutral-800 font-bold text-xl text-center">
                     五行属「{result.element}」
                   </Text>
-                  <Text className="text-purple-600 text-center mt-2">
+                  <Text className="text-neutral-700 text-center mt-2 leading-6">
                     {result.elementAnalysis}
                   </Text>
                 </View>
 
                 <View className="flex-row gap-3">
-                  <View className="flex-1 bg-green-50 rounded-xl p-3">
-                    <Text className="text-green-600 text-sm font-medium">宜用五行</Text>
-                    <Text className="text-green-700 font-bold text-lg mt-1">
+                  <View className="flex-1 bg-mint-light rounded-xl p-3">
+                    <Text className="text-neutral-700 text-sm font-medium">宜用五行</Text>
+                    <Text className="text-neutral-800 font-bold text-lg mt-1">
                       {result.needElements.join('、')}
                     </Text>
                   </View>
-                  <View className="flex-1 bg-red-50 rounded-xl p-3">
-                    <Text className="text-red-600 text-sm font-medium">慎用五行</Text>
-                    <Text className="text-red-700 font-bold text-lg mt-1">
+                  <View className="flex-1 bg-rose-light rounded-xl p-3">
+                    <Text className="text-neutral-700 text-sm font-medium">慎用五行</Text>
+                    <Text className="text-neutral-800 font-bold text-lg mt-1">
                       {result.avoidElements.join('、')}
                     </Text>
                   </View>
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 推荐名字 */}
-              <View className="mt-4 bg-white rounded-2xl p-4 shadow-sm">
-                <Text className="text-gray-800 font-bold mb-4">推荐名字</Text>
+              <GradientCard variant="white" className="p-5 mb-5">
+                <Text className="text-neutral-800 font-bold text-base mb-4">推荐名字</Text>
                 <View className="gap-3">
                   {result.suggestedNames.map((item, index) => (
                     <TouchableOpacity
                       key={index}
-                      className="flex-row items-center justify-between bg-gray-50 rounded-xl p-4"
+                      className="flex-row items-center justify-between bg-neutral-50 rounded-xl p-4"
                     >
-                      <View className="flex-row items-center">
-                        <View className="w-10 h-10 bg-primary-100 rounded-full items-center justify-center">
-                          <Text className="text-primary-500 font-bold">{index + 1}</Text>
+                      <View className="flex-row items-center flex-1">
+                        <View className="w-10 h-10 bg-primary-light rounded-full items-center justify-center flex-shrink-0">
+                          <Text className="text-primary-DEFAULT font-bold">{index + 1}</Text>
                         </View>
-                        <Text className="text-gray-800 font-bold text-xl ml-3">
+                        <Text className="text-neutral-800 font-bold text-xl ml-3 flex-shrink-0">
                           {item.name}
                         </Text>
                       </View>
-                      <Text className="text-gray-500">{item.meaning}</Text>
+                      <Text className="text-neutral-600 ml-2">{item.meaning}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
+              </GradientCard>
             </>
           )}
 
           {/* 五行相生相克图 */}
-          <View className="mt-6 bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold mb-4">五行相生相克</Text>
-            <View className="bg-gray-50 rounded-xl p-4">
-              <Text className="text-green-600 leading-6">
-                相生：金生水 → 水生木 → 木生火 → 火生土 → 土生金
+          <GradientCard variant="mint" className="p-5 mb-5">
+            <View className="flex-row items-center mb-4">
+              <Info size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">五行相生相克</Text>
+            </View>
+            <View className="bg-white/60 rounded-xl p-4">
+              <Text className="text-neutral-800 leading-6 mb-2">
+                <Text className="font-semibold">相生：</Text>
+                金生水 → 水生木 → 木生火 → 火生土 → 土生金
               </Text>
-              <Text className="text-red-500 leading-6 mt-2">
-                相克：金克木 → 木克土 → 土克水 → 水克火 → 火克金
+              <Text className="text-neutral-800 leading-6">
+                <Text className="font-semibold">相克：</Text>
+                金克木 → 木克土 → 土克水 → 水克火 → 火克金
               </Text>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 提示 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
-              * 五行起名仅供参考，建议结合专业命理师意见。
+          <GradientCard variant="sky" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
+              * 五行起名仅供参考,建议结合专业命理师意见。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

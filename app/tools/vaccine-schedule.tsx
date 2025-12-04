@@ -1,13 +1,21 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 疫苗日程工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  ScrollView,
   FlatList,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Syringe, Clock, Info } from 'lucide-react-native';
+import { GradientCard, Tag } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface Vaccine {
   id: string;
@@ -140,60 +148,57 @@ export default function VaccineScheduleScreen() {
   });
 
   const renderVaccine = ({ item }: { item: Vaccine }) => (
-    <View className="bg-white rounded-xl p-4 mb-3 shadow-sm">
+    <GradientCard variant="white" className="p-4 mb-3">
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center flex-1">
           <View
             className={`w-10 h-10 rounded-full items-center justify-center ${
-              item.isFree ? 'bg-green-100' : 'bg-amber-100'
+              item.isFree ? 'bg-mint-light' : 'bg-butter-light'
             }`}
           >
-            <Ionicons
-              name="medical-outline"
+            <Syringe
               size={20}
-              color={item.isFree ? '#22c55e' : '#f59e0b'}
+              color={item.isFree ? Colors.mint.DEFAULT : Colors.butter.DEFAULT}
             />
           </View>
           <View className="ml-3 flex-1">
             <View className="flex-row items-center">
-              <Text className="text-gray-800 font-semibold">{item.name}</Text>
-              <Text className="text-gray-400 text-sm ml-2">({item.shortName})</Text>
+              <Text className="text-neutral-800 font-semibold">{item.name}</Text>
+              <Text className="text-neutral-400 text-sm ml-2">({item.shortName})</Text>
             </View>
-            <Text className="text-gray-500 text-sm mt-0.5">{item.doses}</Text>
+            <Text className="text-neutral-500 text-sm mt-0.5">{item.doses}</Text>
           </View>
         </View>
-        <View
-          className={`px-2 py-1 rounded ${
-            item.isFree ? 'bg-green-50' : 'bg-amber-50'
-          }`}
+        <Tag
+          variant={item.isFree ? 'mint' : 'butter'}
+          size="sm"
         >
-          <Text
-            className={`text-xs font-medium ${
-              item.isFree ? 'text-green-600' : 'text-amber-600'
-            }`}
-          >
-            {item.isFree ? '免费' : '自费'}
-          </Text>
-        </View>
+          {item.isFree ? '免费' : '自费'}
+        </Tag>
       </View>
 
-      <View className="mt-3 pt-3 border-t border-gray-100">
+      <View className="mt-3 pt-3 border-t border-neutral-100">
         <View className="flex-row items-center">
-          <Ionicons name="time-outline" size={16} color="#9ca3af" />
-          <Text className="text-gray-500 text-sm ml-1">{item.ageRange}</Text>
+          <Clock size={16} color={Colors.neutral[400]} />
+          <Text className="text-neutral-600 text-sm ml-1">{item.ageRange}</Text>
         </View>
-        <Text className="text-gray-400 text-sm mt-1">{item.description}</Text>
+        <Text className="text-neutral-500 text-sm mt-1">{item.description}</Text>
       </View>
-    </View>
+    </GradientCard>
   );
 
   return (
-    <>
-      <Stack.Screen options={{ title: '疫苗日程' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '疫苗日程',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <View className="flex-1 bg-background">
+      <View className="flex-1">
         {/* 筛选器 */}
-        <View className="bg-white px-4 py-3 flex-row gap-2">
+        <View className="bg-white/90 px-4 py-3 flex-row gap-2">
           {[
             { id: 'all', label: '全部' },
             { id: 'free', label: '免费疫苗' },
@@ -202,13 +207,13 @@ export default function VaccineScheduleScreen() {
             <TouchableOpacity
               key={type.id}
               className={`px-4 py-2 rounded-full ${
-                selectedType === type.id ? 'bg-primary-500' : 'bg-gray-100'
+                selectedType === type.id ? 'bg-primary-400' : 'bg-neutral-100'
               }`}
               onPress={() => setSelectedType(type.id as any)}
             >
               <Text
                 className={`font-medium ${
-                  selectedType === type.id ? 'text-white' : 'text-gray-600'
+                  selectedType === type.id ? 'text-white' : 'text-neutral-600'
                 }`}
               >
                 {type.label}
@@ -224,18 +229,18 @@ export default function VaccineScheduleScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ padding: 16 }}
           ListHeaderComponent={() => (
-            <View className="bg-blue-50 rounded-xl p-4 mb-4">
+            <GradientCard variant="rose" className="p-4 mb-4">
               <View className="flex-row items-center">
-                <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
-                <Text className="text-blue-700 font-medium ml-2">温馨提示</Text>
+                <Info size={20} color={Colors.neutral[700]} />
+                <Text className="text-neutral-800 font-semibold ml-2">温馨提示</Text>
               </View>
-              <Text className="text-blue-600 text-sm mt-2 leading-5">
+              <Text className="text-neutral-700 text-sm mt-2 leading-5">
                 以上为国家免疫规划疫苗和常见自费疫苗，具体接种时间请以当地社区卫生服务中心安排为准。
               </Text>
-            </View>
+            </GradientCard>
           )}
         />
       </View>
-    </>
+    </LinearGradient>
   );
 }

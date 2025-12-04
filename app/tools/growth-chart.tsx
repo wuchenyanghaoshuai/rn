@@ -1,12 +1,20 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 生长曲线工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { TrendingUp, Info, Lightbulb } from 'lucide-react-native';
+import { GradientCard, Radio } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface GrowthStandard {
   age: string;
@@ -96,123 +104,112 @@ export default function GrowthChartScreen() {
   const getPercentileColor = (percentile: 'p3' | 'p50' | 'p97') => {
     switch (percentile) {
       case 'p3':
-        return '#ef4444';
+        return Colors.rose.DEFAULT;
       case 'p50':
-        return '#22c55e';
+        return Colors.mint.DEFAULT;
       case 'p97':
-        return '#3b82f6';
+        return Colors.sky.DEFAULT;
     }
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '生长曲线' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '生长曲线',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 说明卡片 */}
-          <View className="bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">WHO生长标准曲线</Text>
-            <Text className="text-white/80 mt-2 leading-5">
+          <GradientCard variant="sky" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <TrendingUp size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">WHO生长标准曲线</Text>
+            </View>
+            <Text className="text-neutral-700 text-sm leading-5">
               根据世界卫生组织(WHO)发布的儿童生长发育标准数据，帮助您了解宝宝的生长状况。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 筛选器 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            {/* 性别选择 */}
+          <GradientCard variant="white" className="p-5 mb-5">
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Text className={gender === 'male' ? 'text-white' : 'text-gray-600'}>
-                    男宝
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Text className={gender === 'female' ? 'text-white' : 'text-gray-600'}>
-                    女宝
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={gender === 'male'}
+                  onSelect={() => setGender('male')}
+                  label="男宝"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={gender === 'female'}
+                  onSelect={() => setGender('female')}
+                  label="女宝"
+                  className="flex-1"
+                />
               </View>
             </View>
 
-            {/* 指标选择 */}
             <View>
-              <Text className="text-gray-600 font-medium mb-2">查看指标</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">查看指标</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    metric === 'height' ? 'bg-primary-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setMetric('height')}
-                >
-                  <Text className={metric === 'height' ? 'text-white' : 'text-gray-600'}>
-                    身高
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    metric === 'weight' ? 'bg-primary-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setMetric('weight')}
-                >
-                  <Text className={metric === 'weight' ? 'text-white' : 'text-gray-600'}>
-                    体重
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={metric === 'height'}
+                  onSelect={() => setMetric('height')}
+                  label="身高"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={metric === 'weight'}
+                  onSelect={() => setMetric('weight')}
+                  label="体重"
+                  className="flex-1"
+                />
               </View>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 百分位说明 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-3">百分位说明</Text>
+          <GradientCard variant="mint" className="p-4 mb-5">
+            <Text className="text-neutral-800 font-bold mb-3">百分位说明</Text>
             <View className="flex-row justify-around">
               {[
-                { label: 'P3', desc: '偏低', color: '#ef4444' },
-                { label: 'P50', desc: '中位数', color: '#22c55e' },
-                { label: 'P97', desc: '偏高', color: '#3b82f6' },
+                { label: 'P3', desc: '偏低', color: Colors.rose.DEFAULT },
+                { label: 'P50', desc: '中位数', color: Colors.mint.DEFAULT },
+                { label: 'P97', desc: '偏高', color: Colors.sky.DEFAULT },
               ].map((item) => (
                 <View key={item.label} className="items-center">
                   <View
-                    className="w-8 h-8 rounded-full items-center justify-center"
-                    style={{ backgroundColor: `${item.color}20` }}
+                    className="w-10 h-10 rounded-full items-center justify-center bg-white/60"
                   >
-                    <Text className="font-bold text-xs" style={{ color: item.color }}>
+                    <Text className="font-bold text-sm" style={{ color: item.color }}>
                       {item.label}
                     </Text>
                   </View>
-                  <Text className="text-gray-500 text-xs mt-1">{item.desc}</Text>
+                  <Text className="text-neutral-700 text-xs mt-1">{item.desc}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 数据表格 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold mb-4">
+          <GradientCard variant="white" className="p-5">
+            <Text className="text-neutral-800 font-bold text-lg mb-4">
               {gender === 'male' ? '男宝' : '女宝'}
               {metric === 'height' ? '身高' : '体重'}标准参考
               ({metric === 'height' ? 'cm' : 'kg'})
             </Text>
 
             {/* 表头 */}
-            <View className="flex-row bg-gray-50 rounded-t-xl py-3 px-2">
-              <Text className="flex-1 text-gray-600 font-medium text-center">年龄</Text>
-              <Text className="flex-1 text-gray-600 font-medium text-center">P3</Text>
-              <Text className="flex-1 text-gray-600 font-medium text-center">P50</Text>
-              <Text className="flex-1 text-gray-600 font-medium text-center">P97</Text>
+            <View className="flex-row bg-neutral-50 rounded-xl py-3 px-2">
+              <Text className="flex-1 text-neutral-700 font-semibold text-center">年龄</Text>
+              <Text className="flex-1 text-neutral-700 font-semibold text-center">P3</Text>
+              <Text className="flex-1 text-neutral-700 font-semibold text-center">P50</Text>
+              <Text className="flex-1 text-neutral-700 font-semibold text-center">P97</Text>
             </View>
 
             {/* 数据行 */}
@@ -221,15 +218,15 @@ export default function GrowthChartScreen() {
               return (
                 <View
                   key={index}
-                  className={`flex-row py-3 px-2 border-b border-gray-100 ${
+                  className={`flex-row py-3 px-2 border-b border-neutral-100 ${
                     index === growthStandards.length - 1 ? 'border-b-0' : ''
                   }`}
                 >
-                  <Text className="flex-1 text-gray-800 text-center font-medium">
+                  <Text className="flex-1 text-neutral-800 text-center font-medium">
                     {standard.age}
                   </Text>
                   <Text
-                    className="flex-1 text-center"
+                    className="flex-1 text-center font-medium"
                     style={{ color: getPercentileColor('p3') }}
                   >
                     {data.p3}
@@ -241,7 +238,7 @@ export default function GrowthChartScreen() {
                     {data.p50}
                   </Text>
                   <Text
-                    className="flex-1 text-center"
+                    className="flex-1 text-center font-medium"
                     style={{ color: getPercentileColor('p97') }}
                   >
                     {data.p97}
@@ -249,30 +246,33 @@ export default function GrowthChartScreen() {
                 </View>
               );
             })}
-          </View>
+          </GradientCard>
 
           {/* 解读说明 */}
-          <View className="mt-4 bg-amber-50 rounded-xl p-4">
+          <GradientCard variant="butter" className="p-4 mt-5">
             <View className="flex-row items-center mb-2">
-              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-              <Text className="text-amber-700 font-bold ml-2">如何解读</Text>
+              <Lightbulb size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-semibold ml-2">如何解读</Text>
             </View>
-            <Text className="text-amber-600 text-sm leading-5">
+            <Text className="text-neutral-700 text-sm leading-6">
               • P50 代表同龄儿童的中位数，大多数健康儿童在这个范围{'\n'}
               • 位于 P3-P97 之间通常被认为是正常范围{'\n'}
               • 低于 P3 或高于 P97 建议咨询儿科医生{'\n'}
               • 生长趋势比单次测量更重要，持续跟踪是关键
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 数据来源 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm">
-              * 数据来源：世界卫生组织(WHO) 儿童生长标准
-            </Text>
-          </View>
+          <GradientCard variant="lavender" className="p-4 mt-5">
+            <View className="flex-row items-center">
+              <Info size={16} color={Colors.neutral[600]} />
+              <Text className="text-neutral-700 text-sm ml-2">
+                数据来源：世界卫生组织(WHO) 儿童生长标准
+              </Text>
+            </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

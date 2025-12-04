@@ -5,10 +5,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withSequence } from 'react-native-reanimated';
+import { Video, ResizeMode } from 'expo-av';
 import { momentApi } from '../api/moment';
 import { useAuthStore } from '../stores/auth';
 import ReportModal from './ReportModal';
-import type { Moment } from '../types';
+import type { Moment, MomentMedia } from '../types';
 
 interface MomentCardProps {
   moment: Moment;
@@ -152,6 +153,27 @@ export default function MomentCard({ moment, style }: MomentCardProps) {
     cardScale.value = withSpring(1, { damping: 15, stiffness: 400 });
   };
 
+  const renderMediaItem = (media: MomentMedia, isSingle: boolean) => {
+    if (media.media_type === 'video') {
+      return (
+        <Video
+          source={{ uri: media.url }}
+          style={isSingle ? styles.singleVideo : styles.gridVideo}
+          resizeMode={ResizeMode.COVER}
+          useNativeControls
+          isLooping={false}
+        />
+      );
+    }
+    return (
+      <Image
+        source={{ uri: media.url }}
+        style={isSingle ? styles.singleImage : styles.gridImage}
+        resizeMode="cover"
+      />
+    );
+  };
+
   return (
     <Animated.View style={[styles.cardContainer, cardAnimatedStyle, style]}>
       <Pressable
@@ -247,15 +269,11 @@ export default function MomentCard({ moment, style }: MomentCardProps) {
             </View>
           )}
 
-          {/* 图片网格 */}
+          {/* 媒体网格（图片/视频） */}
           {moment.media && moment.media.length > 0 && (
             <View style={styles.mediaContainer}>
               {moment.media.length === 1 ? (
-                <Image
-                  source={{ uri: moment.media[0].url }}
-                  style={styles.singleImage}
-                  resizeMode="cover"
-                />
+                renderMediaItem(moment.media[0], true)
               ) : (
                 <View style={styles.imageGrid}>
                   {moment.media.slice(0, 9).map((media, index) => {
@@ -263,15 +281,9 @@ export default function MomentCard({ moment, style }: MomentCardProps) {
                     const isTwoColumn = count === 2 || count === 4;
 
                     return (
-                      <Image
-                        key={media.id || index}
-                        source={{ uri: media.url }}
-                        style={[
-                          styles.gridImage,
-                          { width: isTwoColumn ? '48.5%' : '32%' },
-                        ]}
-                        resizeMode="cover"
-                      />
+                      <View key={media.id || index} style={{ width: isTwoColumn ? '48.5%' : '32%' }}>
+                        {renderMediaItem(media, false)}
+                      </View>
                     );
                   })}
                 </View>
@@ -458,15 +470,29 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: '#fce7f3',
   },
+  singleVideo: {
+    width: '65%',
+    height: 200,
+    borderRadius: 16,
+    backgroundColor: '#000',
+  },
   imageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 6,
   },
   gridImage: {
+    width: '100%',
     aspectRatio: 1,
     borderRadius: 12,
     backgroundColor: '#fce7f3',
+    marginBottom: 4,
+  },
+  gridVideo: {
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 12,
+    backgroundColor: '#000',
     marginBottom: 4,
   },
   actionsContainer: {

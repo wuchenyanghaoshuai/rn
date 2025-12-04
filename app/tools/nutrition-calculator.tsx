@@ -1,14 +1,22 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 营养计算器工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Calculator, Flame, Weight } from 'lucide-react-native';
+import { Input, Button, GradientCard, Radio } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface NutritionResult {
   calories: number;
@@ -108,70 +116,66 @@ export default function NutritionCalculatorScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '营养计算' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '营养计算',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            {/* 性别选择 */}
+          <GradientCard variant="white" className="p-5 mb-5">
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Text className={gender === 'male' ? 'text-white' : 'text-gray-600'}>
-                    男宝
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Text className={gender === 'female' ? 'text-white' : 'text-gray-600'}>
-                    女宝
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={gender === 'male'}
+                  onSelect={() => setGender('male')}
+                  label="男宝"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={gender === 'female'}
+                  onSelect={() => setGender('female')}
+                  label="女宝"
+                  className="flex-1"
+                />
               </View>
             </View>
 
             {/* 年龄输入 */}
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">年龄</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">年龄</Text>
               <View className="flex-row gap-3">
-                <TextInput
-                  className="flex-1 bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="请输入年龄"
-                  placeholderTextColor="#9ca3af"
-                  value={age}
-                  onChangeText={setAge}
-                  keyboardType="decimal-pad"
-                />
-                <View className="flex-row bg-gray-100 rounded-xl p-1">
+                <View className="flex-1">
+                  <Input
+                    placeholder="请输入年龄"
+                    value={age}
+                    onChangeText={setAge}
+                    keyboardType="decimal-pad"
+                  />
+                </View>
+                <View className="flex-row bg-neutral-100 rounded-xl p-1">
                   <TouchableOpacity
-                    className={`px-3 py-2 rounded-lg ${
+                    className={`px-4 py-2.5 rounded-lg ${
                       ageUnit === 'months' ? 'bg-white shadow-sm' : ''
                     }`}
                     onPress={() => setAgeUnit('months')}
                   >
-                    <Text className={ageUnit === 'months' ? 'text-primary-500' : 'text-gray-500'}>
+                    <Text className={`font-medium ${ageUnit === 'months' ? 'text-primary-400' : 'text-neutral-500'}`}>
                       月
                     </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    className={`px-3 py-2 rounded-lg ${
+                    className={`px-4 py-2.5 rounded-lg ${
                       ageUnit === 'years' ? 'bg-white shadow-sm' : ''
                     }`}
                     onPress={() => setAgeUnit('years')}
                   >
-                    <Text className={ageUnit === 'years' ? 'text-primary-500' : 'text-gray-500'}>
+                    <Text className={`font-medium ${ageUnit === 'years' ? 'text-primary-400' : 'text-neutral-500'}`}>
                       岁
                     </Text>
                   </TouchableOpacity>
@@ -179,97 +183,96 @@ export default function NutritionCalculatorScreen() {
               </View>
             </View>
 
-            {/* 体重输入 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">体重 (kg)</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入体重"
-                placeholderTextColor="#9ca3af"
-                value={weight}
-                onChangeText={setWeight}
-                keyboardType="decimal-pad"
-              />
-            </View>
+            <Input
+              label="体重 (kg)"
+              placeholder="请输入体重"
+              value={weight}
+              onChangeText={setWeight}
+              keyboardType="decimal-pad"
+              icon={<Weight size={20} color={Colors.neutral[400]} />}
+              className="mb-5"
+            />
 
-            <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center"
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               onPress={calculate}
+              icon={<Calculator size={20} color="white" />}
             >
-              <Text className="text-white font-semibold text-lg">计算营养需求</Text>
-            </TouchableOpacity>
-          </View>
+              计算营养需求
+            </Button>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && (
-            <View className="mt-6">
-              <Text className="text-lg font-bold text-gray-800 mb-3">每日营养需求</Text>
+            <View>
+              <Text className="text-lg font-bold text-neutral-800 mb-3">每日营养需求</Text>
 
               {/* 能量 */}
-              <View className="bg-white rounded-xl p-4 shadow-sm mb-3">
+              <GradientCard variant="butter" className="p-5 mb-3">
                 <View className="flex-row items-center">
-                  <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center">
-                    <Ionicons name="flame-outline" size={20} color="#f97316" />
+                  <View className="w-12 h-12 bg-white/60 rounded-full items-center justify-center">
+                    <Flame size={24} color={Colors.butter.DEFAULT} />
                   </View>
                   <View className="ml-3 flex-1">
-                    <Text className="text-gray-500 text-sm">热量</Text>
-                    <Text className="text-gray-800 text-xl font-bold">
+                    <Text className="text-neutral-600 text-sm">热量</Text>
+                    <Text className="text-neutral-800 text-2xl font-bold">
                       {result.calories} kcal
                     </Text>
                   </View>
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 三大营养素 */}
               <View className="flex-row gap-3 mb-3">
-                <View className="flex-1 bg-white rounded-xl p-4 shadow-sm">
-                  <Text className="text-gray-500 text-sm">蛋白质</Text>
-                  <Text className="text-red-500 text-xl font-bold">{result.protein}g</Text>
-                </View>
-                <View className="flex-1 bg-white rounded-xl p-4 shadow-sm">
-                  <Text className="text-gray-500 text-sm">碳水</Text>
-                  <Text className="text-amber-500 text-xl font-bold">{result.carbs}g</Text>
-                </View>
-                <View className="flex-1 bg-white rounded-xl p-4 shadow-sm">
-                  <Text className="text-gray-500 text-sm">脂肪</Text>
-                  <Text className="text-blue-500 text-xl font-bold">{result.fat}g</Text>
-                </View>
+                <GradientCard variant="rose" className="flex-1 p-4">
+                  <Text className="text-neutral-700 text-sm">蛋白质</Text>
+                  <Text className="text-neutral-800 text-xl font-bold mt-1">{result.protein}g</Text>
+                </GradientCard>
+                <GradientCard variant="mint" className="flex-1 p-4">
+                  <Text className="text-neutral-700 text-sm">碳水</Text>
+                  <Text className="text-neutral-800 text-xl font-bold mt-1">{result.carbs}g</Text>
+                </GradientCard>
+                <GradientCard variant="sky" className="flex-1 p-4">
+                  <Text className="text-neutral-700 text-sm">脂肪</Text>
+                  <Text className="text-neutral-800 text-xl font-bold mt-1">{result.fat}g</Text>
+                </GradientCard>
               </View>
 
               {/* 微量元素 */}
-              <View className="bg-white rounded-xl p-4 shadow-sm">
-                <Text className="text-gray-800 font-medium mb-3">微量元素</Text>
+              <GradientCard variant="white" className="p-5">
+                <Text className="text-neutral-800 font-bold text-base mb-3">微量元素</Text>
                 <View className="flex-row flex-wrap gap-3">
-                  <View className="bg-green-50 rounded-lg p-3 min-w-[45%] flex-1">
-                    <Text className="text-green-600 text-sm">钙</Text>
-                    <Text className="text-green-700 font-bold">{result.calcium}mg</Text>
+                  <View className="bg-mint-light rounded-xl p-3 min-w-[45%] flex-1">
+                    <Text className="text-neutral-700 text-sm">钙</Text>
+                    <Text className="text-neutral-800 font-bold mt-0.5">{result.calcium}mg</Text>
                   </View>
-                  <View className="bg-red-50 rounded-lg p-3 min-w-[45%] flex-1">
-                    <Text className="text-red-600 text-sm">铁</Text>
-                    <Text className="text-red-700 font-bold">{result.iron}mg</Text>
+                  <View className="bg-rose-light rounded-xl p-3 min-w-[45%] flex-1">
+                    <Text className="text-neutral-700 text-sm">铁</Text>
+                    <Text className="text-neutral-800 font-bold mt-0.5">{result.iron}mg</Text>
                   </View>
-                  <View className="bg-purple-50 rounded-lg p-3 min-w-[45%] flex-1">
-                    <Text className="text-purple-600 text-sm">维生素A</Text>
-                    <Text className="text-purple-700 font-bold">{result.vitaminA}μg</Text>
+                  <View className="bg-lavender-light rounded-xl p-3 min-w-[45%] flex-1">
+                    <Text className="text-neutral-700 text-sm">维生素A</Text>
+                    <Text className="text-neutral-800 font-bold mt-0.5">{result.vitaminA}μg</Text>
                   </View>
-                  <View className="bg-yellow-50 rounded-lg p-3 min-w-[45%] flex-1">
-                    <Text className="text-yellow-600 text-sm">维生素C</Text>
-                    <Text className="text-yellow-700 font-bold">{result.vitaminC}mg</Text>
+                  <View className="bg-butter-light rounded-xl p-3 min-w-[45%] flex-1">
+                    <Text className="text-neutral-700 text-sm">维生素C</Text>
+                    <Text className="text-neutral-800 font-bold mt-0.5">{result.vitaminC}mg</Text>
                   </View>
                 </View>
-              </View>
+              </GradientCard>
             </View>
           )}
 
           {/* 提示 */}
-          <View className="mt-6 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
-              * 以上数据根据《中国居民膳食营养素参考摄入量》计算，仅供参考。
-              实际营养需求因个体差异、活动量等因素有所不同。
+          <GradientCard variant="lavender" className="p-4 mt-5">
+            <Text className="text-neutral-700 text-sm leading-5">
+              * 以上数据根据《中国居民膳食营养素参考摄入量》计算，仅供参考。实际营养需求因个体差异、活动量等因素有所不同。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

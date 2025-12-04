@@ -1,3 +1,9 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 睡眠管理工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
@@ -6,7 +12,10 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Moon, BedDouble, Sun, Clock, AlarmClock, Lightbulb } from 'lucide-react-native';
+import { GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface SleepSchedule {
   ageRange: string;
@@ -112,25 +121,30 @@ export default function SleepScheduleScreen() {
   const schedule = schedules[selectedAge];
 
   return (
-    <>
-      <Stack.Screen options={{ title: '睡眠管理' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '睡眠管理',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 年龄选择 */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5 -mx-5 px-5">
             <View className="flex-row gap-2">
               {schedules.map((s, index) => (
                 <TouchableOpacity
                   key={index}
-                  className={`px-4 py-2 rounded-full ${
-                    selectedAge === index ? 'bg-primary-500' : 'bg-white'
+                  className={`px-4 py-2.5 rounded-full ${
+                    selectedAge === index ? 'bg-primary-400' : 'bg-white'
                   }`}
                   onPress={() => setSelectedAge(index)}
                 >
                   <Text
                     className={`font-medium ${
-                      selectedAge === index ? 'text-white' : 'text-gray-600'
+                      selectedAge === index ? 'text-white' : 'text-neutral-600'
                     }`}
                   >
                     {s.ageRange}
@@ -141,88 +155,87 @@ export default function SleepScheduleScreen() {
           </ScrollView>
 
           {/* 睡眠时长卡片 */}
-          <View className="bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-5 mb-4">
+          <GradientCard variant="lavender" className="p-5 mb-5">
             <View className="flex-row items-center">
-              <Ionicons name="moon-outline" size={24} color="#fff" />
-              <Text className="text-white text-lg font-bold ml-2">推荐睡眠时长</Text>
+              <Moon size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">推荐睡眠时长</Text>
             </View>
-            <Text className="text-white text-4xl font-bold mt-3">{schedule.totalSleep}</Text>
-            <Text className="text-white/70 mt-1">{schedule.ageRange} 宝宝每日总睡眠</Text>
-          </View>
+            <Text className="text-neutral-800 text-4xl font-bold mt-3">{schedule.totalSleep}</Text>
+            <Text className="text-neutral-700 mt-1">{schedule.ageRange} 宝宝每日总睡眠</Text>
+          </GradientCard>
 
           {/* 详细信息 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-4">睡眠安排</Text>
+          <GradientCard variant="white" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-4">睡眠安排</Text>
 
             <View className="gap-4">
               <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-indigo-100 rounded-full items-center justify-center">
-                  <Ionicons name="bed-outline" size={20} color="#6366f1" />
+                <View className="w-10 h-10 bg-lavender-light rounded-full items-center justify-center">
+                  <BedDouble size={20} color={Colors.lavender.DEFAULT} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="text-gray-500 text-sm">夜间睡眠</Text>
-                  <Text className="text-gray-800 font-semibold">{schedule.nightSleep}</Text>
+                  <Text className="text-neutral-600 text-sm">夜间睡眠</Text>
+                  <Text className="text-neutral-800 font-semibold">{schedule.nightSleep}</Text>
                 </View>
               </View>
 
               <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-amber-100 rounded-full items-center justify-center">
-                  <Ionicons name="sunny-outline" size={20} color="#f59e0b" />
+                <View className="w-10 h-10 bg-butter-light rounded-full items-center justify-center">
+                  <Sun size={20} color={Colors.butter.DEFAULT} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="text-gray-500 text-sm">日间小睡</Text>
-                  <Text className="text-gray-800 font-semibold">{schedule.naps}</Text>
-                  <Text className="text-gray-400 text-sm">{schedule.napTimes}</Text>
+                  <Text className="text-neutral-600 text-sm">日间小睡</Text>
+                  <Text className="text-neutral-800 font-semibold">{schedule.naps}</Text>
+                  <Text className="text-neutral-500 text-sm">{schedule.napTimes}</Text>
                 </View>
               </View>
 
               <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center">
-                  <Ionicons name="time-outline" size={20} color="#8b5cf6" />
+                <View className="w-10 h-10 bg-sky-light rounded-full items-center justify-center">
+                  <Clock size={20} color={Colors.sky.DEFAULT} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="text-gray-500 text-sm">建议入睡时间</Text>
-                  <Text className="text-gray-800 font-semibold">{schedule.bedtime}</Text>
+                  <Text className="text-neutral-600 text-sm">建议入睡时间</Text>
+                  <Text className="text-neutral-800 font-semibold">{schedule.bedtime}</Text>
                 </View>
               </View>
 
               <View className="flex-row items-center">
-                <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center">
-                  <Ionicons name="alarm-outline" size={20} color="#f97316" />
+                <View className="w-10 h-10 bg-rose-light rounded-full items-center justify-center">
+                  <AlarmClock size={20} color={Colors.rose.DEFAULT} />
                 </View>
                 <View className="ml-3 flex-1">
-                  <Text className="text-gray-500 text-sm">建议起床时间</Text>
-                  <Text className="text-gray-800 font-semibold">{schedule.wakeTime}</Text>
+                  <Text className="text-neutral-600 text-sm">建议起床时间</Text>
+                  <Text className="text-neutral-800 font-semibold">{schedule.wakeTime}</Text>
                 </View>
               </View>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 睡眠小贴士 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
+          <GradientCard variant="mint" className="p-5 mb-5">
             <View className="flex-row items-center mb-3">
-              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-              <Text className="text-gray-800 font-bold ml-2">睡眠小贴士</Text>
+              <Lightbulb size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">睡眠小贴士</Text>
             </View>
             {schedule.tips.map((tip, index) => (
-              <View key={index} className="flex-row mb-2">
-                <View className="w-5 h-5 bg-amber-100 rounded-full items-center justify-center mt-0.5">
-                  <Text className="text-amber-600 text-xs font-bold">{index + 1}</Text>
+              <View key={index} className="flex-row mb-3 last:mb-0">
+                <View className="w-6 h-6 bg-white/60 rounded-full items-center justify-center mt-0.5 flex-shrink-0">
+                  <Text className="text-neutral-800 text-xs font-bold">{index + 1}</Text>
                 </View>
-                <Text className="text-gray-600 flex-1 ml-2 leading-5">{tip}</Text>
+                <Text className="text-neutral-700 flex-1 ml-2 leading-5">{tip}</Text>
               </View>
             ))}
-          </View>
+          </GradientCard>
 
           {/* 提示 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
-              * 每个宝宝的睡眠需求可能有所不同，以上为一般建议。
-              如果您对宝宝的睡眠有疑虑，建议咨询儿科医生。
+          <GradientCard variant="lavender" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
+              * 每个宝宝的睡眠需求可能有所不同，以上为一般建议。如果您对宝宝的睡眠有疑虑，建议咨询儿科医生。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

@@ -102,6 +102,14 @@ export const authApi = {
       new_password: newPassword,
     });
   },
+
+  // 发送注册验证码
+  async sendRegisterCode(phone: string): Promise<ApiResponse<null>> {
+    return http.post<null>(API_CONFIG.ENDPOINTS.AUTH.SEND_SMS, {
+      phone,
+      scene: 'register',
+    });
+  },
 };
 
 // 认证工具函数

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,12 +15,13 @@ import {
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { useQuery, useMutation, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
 import { Ionicons } from '@expo/vector-icons';
+import { Video, ResizeMode } from 'expo-av';
 import { momentApi } from '../../src/api/moment';
 import { useAuthStore } from '../../src/stores/auth';
 import LoadingSpinner from '../../src/components/LoadingSpinner';
 import EmptyState from '../../src/components/EmptyState';
 import ReportModal from '../../src/components/ReportModal';
-import type { MomentReply } from '../../src/types';
+import type { MomentReply, MomentMedia } from '../../src/types';
 
 export default function MomentDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -300,17 +301,29 @@ export default function MomentDetailScreen() {
               </View>
             )}
 
-            {/* 图片 */}
+            {/* 媒体（图片/视频） */}
             {moment.media && moment.media.length > 0 && (
               <View className="mt-4">
-                {moment.media.map((media) => (
-                  <Image
-                    key={media.id}
-                    source={{ uri: media.url }}
-                    className="w-full rounded-xl mb-2"
-                    style={{ aspectRatio: 1 }}
-                    resizeMode="cover"
-                  />
+                {moment.media.map((media: MomentMedia) => (
+                  <React.Fragment key={media.id}>
+                    {media.media_type === 'video' ? (
+                      <Video
+                        source={{ uri: media.url }}
+                        className="w-full rounded-xl mb-2"
+                        style={{ aspectRatio: 16 / 9 }}
+                        resizeMode={ResizeMode.CONTAIN}
+                        useNativeControls
+                        isLooping={false}
+                      />
+                    ) : (
+                      <Image
+                        source={{ uri: media.url }}
+                        className="w-full rounded-xl mb-2"
+                        style={{ aspectRatio: 1 }}
+                        resizeMode="cover"
+                      />
+                    )}
+                  </React.Fragment>
                 ))}
               </View>
             )}

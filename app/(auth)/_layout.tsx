@@ -18,14 +18,14 @@ export default function AuthLayout() {
       <Stack.Screen
         name="login"
         options={{
-          title: '登录',
+          headerShown: false,
           presentation: 'modal',
         }}
       />
       <Stack.Screen
         name="register"
         options={{
-          title: '注册',
+          headerShown: false,
         }}
       />
       <Stack.Screen

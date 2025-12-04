@@ -1,14 +1,22 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 生长记录工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { TrendingUp, Ruler, Weight, Circle, Plus, X, FileText, Info } from 'lucide-react-native';
+import { Input, Button, GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface GrowthRecord {
   id: string;
@@ -82,179 +90,176 @@ export default function GrowthRecordScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '生长记录' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '生长记录',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 最新数据卡片 */}
           {latestRecord && (
-            <View className="bg-gradient-to-r from-green-500 to-teal-500 rounded-2xl p-5 mb-4">
-              <Text className="text-white/80 text-sm">最新记录 · {latestRecord.date}</Text>
+            <GradientCard variant="mint" className="p-5 mb-5">
+              <Text className="text-neutral-700 text-sm">最新记录 · {latestRecord.date}</Text>
               <View className="flex-row justify-around mt-4">
                 <View className="items-center">
-                  <Text className="text-white text-3xl font-bold">
+                  <Text className="text-neutral-800 text-3xl font-bold">
                     {latestRecord.height}
                   </Text>
-                  <Text className="text-white/70 text-sm mt-1">身高 (cm)</Text>
+                  <Text className="text-neutral-700 text-sm mt-1">身高 (cm)</Text>
                   {previousRecord && (
-                    <Text className="text-white/60 text-xs mt-1">
+                    <Text className="text-neutral-600 text-xs mt-1">
                       {getGrowthChange(latestRecord.height, previousRecord.height)} cm
                     </Text>
                   )}
                 </View>
-                <View className="w-px bg-white/30" />
+                <View className="w-px bg-neutral-300" />
                 <View className="items-center">
-                  <Text className="text-white text-3xl font-bold">
+                  <Text className="text-neutral-800 text-3xl font-bold">
                     {latestRecord.weight}
                   </Text>
-                  <Text className="text-white/70 text-sm mt-1">体重 (kg)</Text>
+                  <Text className="text-neutral-700 text-sm mt-1">体重 (kg)</Text>
                   {previousRecord && (
-                    <Text className="text-white/60 text-xs mt-1">
+                    <Text className="text-neutral-600 text-xs mt-1">
                       {getGrowthChange(latestRecord.weight, previousRecord.weight)} kg
                     </Text>
                   )}
                 </View>
               </View>
-            </View>
+            </GradientCard>
           )}
 
           {/* 添加记录按钮/表单 */}
           {showForm ? (
-            <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+            <GradientCard variant="white" className="p-5 mb-5">
               <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-gray-800 font-bold">添加记录</Text>
+                <Text className="text-neutral-800 font-bold text-base">添加记录</Text>
                 <TouchableOpacity onPress={() => setShowForm(false)}>
-                  <Ionicons name="close" size={24} color="#9ca3af" />
+                  <X size={24} color={Colors.neutral[400]} />
                 </TouchableOpacity>
               </View>
 
-              <View className="mb-3">
-                <Text className="text-gray-600 text-sm mb-1">日期</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="如：2024-05-15"
-                  placeholderTextColor="#9ca3af"
-                  value={newRecord.date}
-                  onChangeText={(text) => setNewRecord({ ...newRecord, date: text })}
-                />
-              </View>
+              <Input
+                label="日期"
+                placeholder="如：2024-05-15"
+                value={newRecord.date}
+                onChangeText={(text) => setNewRecord({ ...newRecord, date: text })}
+                className="mb-3"
+              />
 
               <View className="flex-row gap-3 mb-3">
                 <View className="flex-1">
-                  <Text className="text-gray-600 text-sm mb-1">身高 (cm)</Text>
-                  <TextInput
-                    className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
+                  <Input
+                    label="身高 (cm)"
                     placeholder="如：65"
-                    placeholderTextColor="#9ca3af"
                     value={newRecord.height}
                     onChangeText={(text) => setNewRecord({ ...newRecord, height: text })}
                     keyboardType="decimal-pad"
+                    icon={<Ruler size={20} color={Colors.neutral[400]} />}
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-gray-600 text-sm mb-1">体重 (kg)</Text>
-                  <TextInput
-                    className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
+                  <Input
+                    label="体重 (kg)"
                     placeholder="如：6.5"
-                    placeholderTextColor="#9ca3af"
                     value={newRecord.weight}
                     onChangeText={(text) => setNewRecord({ ...newRecord, weight: text })}
                     keyboardType="decimal-pad"
+                    icon={<Weight size={20} color={Colors.neutral[400]} />}
                   />
                 </View>
               </View>
 
-              <View className="mb-3">
-                <Text className="text-gray-600 text-sm mb-1">头围 (cm) - 可选</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="如：42"
-                  placeholderTextColor="#9ca3af"
-                  value={newRecord.headCircumference}
-                  onChangeText={(text) =>
-                    setNewRecord({ ...newRecord, headCircumference: text })
-                  }
-                  keyboardType="decimal-pad"
-                />
-              </View>
+              <Input
+                label="头围 (cm) - 可选"
+                placeholder="如：42"
+                value={newRecord.headCircumference}
+                onChangeText={(text) =>
+                  setNewRecord({ ...newRecord, headCircumference: text })
+                }
+                keyboardType="decimal-pad"
+                icon={<Circle size={20} color={Colors.neutral[400]} />}
+                className="mb-3"
+              />
 
-              <View className="mb-4">
-                <Text className="text-gray-600 text-sm mb-1">备注 - 可选</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                  placeholder="如：体检日、打疫苗等"
-                  placeholderTextColor="#9ca3af"
-                  value={newRecord.note}
-                  onChangeText={(text) => setNewRecord({ ...newRecord, note: text })}
-                />
-              </View>
+              <Input
+                label="备注 - 可选"
+                placeholder="如：体检日、打疫苗等"
+                value={newRecord.note}
+                onChangeText={(text) => setNewRecord({ ...newRecord, note: text })}
+                className="mb-4"
+              />
 
-              <TouchableOpacity
-                className="bg-primary-500 py-3 rounded-xl items-center"
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
                 onPress={addRecord}
               >
-                <Text className="text-white font-semibold">保存记录</Text>
-              </TouchableOpacity>
-            </View>
+                保存记录
+              </Button>
+            </GradientCard>
           ) : (
             <TouchableOpacity
-              className="bg-white rounded-2xl p-4 shadow-sm mb-4 flex-row items-center justify-center"
+              className="bg-white rounded-2xl p-4 shadow-sm mb-5 flex-row items-center justify-center"
               onPress={() => setShowForm(true)}
             >
-              <Ionicons name="add-circle-outline" size={24} color="#e76f51" />
-              <Text className="text-primary-500 font-medium ml-2">添加新记录</Text>
+              <Plus size={24} color={Colors.primary[400]} />
+              <Text className="text-primary-400 font-medium ml-2">添加新记录</Text>
             </TouchableOpacity>
           )}
 
           {/* 历史记录 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold mb-4">历史记录</Text>
+          <GradientCard variant="white" className="p-5">
+            <Text className="text-neutral-800 font-bold text-base mb-4">历史记录</Text>
 
             {records.length === 0 ? (
               <View className="py-8 items-center">
-                <Ionicons name="document-text-outline" size={48} color="#d1d5db" />
-                <Text className="text-gray-400 mt-2">暂无记录</Text>
+                <FileText size={48} color={Colors.neutral[300]} />
+                <Text className="text-neutral-400 mt-2">暂无记录</Text>
               </View>
             ) : (
               <View className="gap-3">
                 {records.map((record, index) => (
                   <View
                     key={record.id}
-                    className="bg-gray-50 rounded-xl p-4"
+                    className="bg-neutral-50 rounded-xl p-4"
                   >
                     <View className="flex-row items-center justify-between mb-2">
-                      <Text className="text-gray-800 font-medium">{record.date}</Text>
+                      <Text className="text-neutral-800 font-medium">{record.date}</Text>
                       {index === 0 && (
-                        <View className="bg-green-100 px-2 py-0.5 rounded">
-                          <Text className="text-green-600 text-xs">最新</Text>
+                        <View className="bg-mint-light px-2 py-0.5 rounded-lg">
+                          <Text className="text-neutral-700 text-xs">最新</Text>
                         </View>
                       )}
                     </View>
                     <View className="flex-row gap-4">
                       <View className="flex-row items-center">
-                        <Ionicons name="resize-outline" size={16} color="#6b7280" />
-                        <Text className="text-gray-600 ml-1">
+                        <Ruler size={16} color={Colors.neutral[500]} />
+                        <Text className="text-neutral-600 ml-1">
                           身高：{record.height} cm
                         </Text>
                       </View>
                       <View className="flex-row items-center">
-                        <Ionicons name="fitness-outline" size={16} color="#6b7280" />
-                        <Text className="text-gray-600 ml-1">
+                        <Weight size={16} color={Colors.neutral[500]} />
+                        <Text className="text-neutral-600 ml-1">
                           体重：{record.weight} kg
                         </Text>
                       </View>
                     </View>
                     {record.headCircumference && (
                       <View className="flex-row items-center mt-1">
-                        <Ionicons name="ellipse-outline" size={16} color="#6b7280" />
-                        <Text className="text-gray-600 ml-1">
+                        <Circle size={16} color={Colors.neutral[500]} />
+                        <Text className="text-neutral-600 ml-1">
                           头围：{record.headCircumference} cm
                         </Text>
                       </View>
                     )}
                     {record.note && (
-                      <Text className="text-gray-400 text-sm mt-2">
+                      <Text className="text-neutral-500 text-sm mt-2">
                         备注：{record.note}
                       </Text>
                     )}
@@ -262,22 +267,22 @@ export default function GrowthRecordScreen() {
                 ))}
               </View>
             )}
-          </View>
+          </GradientCard>
 
           {/* 提示 */}
-          <View className="mt-4 bg-blue-50 rounded-xl p-4">
-            <View className="flex-row items-center">
-              <Ionicons name="information-circle-outline" size={20} color="#3b82f6" />
-              <Text className="text-blue-700 font-medium ml-2">测量建议</Text>
+          <GradientCard variant="sky" className="p-4 mt-5">
+            <View className="flex-row items-center mb-2">
+              <Info size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-semibold ml-2">测量建议</Text>
             </View>
-            <Text className="text-blue-600 text-sm mt-2 leading-5">
+            <Text className="text-neutral-700 text-sm leading-5">
               • 建议每月同一时间测量，确保数据可比性{'\n'}
               • 身高测量时脱鞋，体重测量时穿轻薄衣物{'\n'}
               • 定期记录有助于及时发现生长发育问题
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

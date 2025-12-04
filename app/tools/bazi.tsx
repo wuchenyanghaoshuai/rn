@@ -1,14 +1,21 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 生辰八字工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Calendar, Lightbulb } from 'lucide-react-native';
+import { Input, Button, GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface BaziResult {
   yearPillar: { heavenlyStem: string; earthlyBranch: string };
@@ -128,8 +135,8 @@ export default function BaziScreen() {
 
     return (
       <View className="flex-1 items-center">
-        <Text className="text-gray-500 text-xs mb-2">{title}</Text>
-        <View className="bg-red-50 rounded-lg p-2 w-full items-center">
+        <Text className="text-neutral-600 text-xs mb-2">{title}</Text>
+        <View className="bg-rose-light rounded-lg p-2 w-full items-center">
           <Text
             className="text-2xl font-bold"
             style={{ color: elementColors[stemElement] }}
@@ -140,7 +147,7 @@ export default function BaziScreen() {
             {stemElement}
           </Text>
         </View>
-        <View className="bg-amber-50 rounded-lg p-2 w-full items-center mt-1">
+        <View className="bg-butter-light rounded-lg p-2 w-full items-center mt-1">
           <Text
             className="text-2xl font-bold"
             style={{ color: elementColors[branchElement] }}
@@ -156,97 +163,104 @@ export default function BaziScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '生辰八字' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '生辰八字',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 介绍 */}
-          <View className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">生辰八字查询</Text>
-            <Text className="text-white/80 mt-2 leading-5">
+          <GradientCard variant="lavender" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <Calendar size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">生辰八字查询</Text>
+            </View>
+            <Text className="text-neutral-700 leading-5">
               根据出生时间计算八字，分析五行旺衰，为起名提供参考。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <View className="flex-row gap-3 mb-3">
+          <GradientCard variant="white" className="p-5 mb-5">
+            <View className="flex-row gap-3 mb-4">
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">年</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">年</Text>
+                <Input
                   placeholder="2024"
-                  placeholderTextColor="#9ca3af"
                   value={year}
                   onChangeText={setYear}
                   keyboardType="number-pad"
                   maxLength={4}
+                  className="text-center"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">月</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">月</Text>
+                <Input
                   placeholder="1"
-                  placeholderTextColor="#9ca3af"
                   value={month}
                   onChangeText={setMonth}
                   keyboardType="number-pad"
                   maxLength={2}
+                  className="text-center"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">日</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">日</Text>
+                <Input
                   placeholder="1"
-                  placeholderTextColor="#9ca3af"
                   value={day}
                   onChangeText={setDay}
                   keyboardType="number-pad"
                   maxLength={2}
+                  className="text-center"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-600 text-sm mb-1">时(0-23)</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">时(0-23)</Text>
+                <Input
                   placeholder="12"
-                  placeholderTextColor="#9ca3af"
                   value={hour}
                   onChangeText={setHour}
                   keyboardType="number-pad"
                   maxLength={2}
+                  className="text-center"
                 />
               </View>
             </View>
 
-            <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center"
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               onPress={calculate}
+              icon={<Calendar size={20} color="white" />}
             >
-              <Text className="text-white font-semibold text-lg">查询八字</Text>
-            </TouchableOpacity>
-          </View>
+              查询八字
+            </Button>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && (
             <>
               {/* 八字四柱 */}
-              <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-                <Text className="text-gray-800 font-bold mb-4 text-center">八字四柱</Text>
+              <GradientCard variant="white" className="p-5 mb-5">
+                <Text className="text-neutral-800 font-bold text-base mb-4 text-center">八字四柱</Text>
                 <View className="flex-row gap-3">
                   {renderPillar('年柱', result.yearPillar)}
                   {renderPillar('月柱', result.monthPillar)}
                   {renderPillar('日柱', result.dayPillar)}
                   {renderPillar('时柱', result.hourPillar)}
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 五行统计 */}
-              <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-                <Text className="text-gray-800 font-bold mb-4">五行统计</Text>
+              <GradientCard variant="mint" className="p-5 mb-5">
+                <Text className="text-neutral-800 font-bold text-base mb-4">五行统计</Text>
                 <View className="flex-row justify-around">
                   {[
                     { name: '金', count: result.fiveElements.metal, color: elementColors['金'] },
@@ -264,32 +278,32 @@ export default function BaziScreen() {
                           {item.name}
                         </Text>
                       </View>
-                      <Text className="text-gray-700 font-bold mt-1">{item.count}</Text>
+                      <Text className="text-neutral-800 font-bold mt-2">{item.count}</Text>
                     </View>
                   ))}
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 分析 */}
-              <View className="bg-amber-50 rounded-2xl p-4 mb-4">
-                <View className="flex-row items-center mb-2">
-                  <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-                  <Text className="text-amber-700 font-bold ml-2">八字分析</Text>
+              <GradientCard variant="butter" className="p-5 mb-5">
+                <View className="flex-row items-center mb-3">
+                  <Lightbulb size={20} color={Colors.neutral[700]} />
+                  <Text className="text-neutral-800 font-bold ml-2">八字分析</Text>
                 </View>
-                <Text className="text-amber-600 leading-6">{result.analysis}</Text>
-              </View>
+                <Text className="text-neutral-700 leading-6">{result.analysis}</Text>
+              </GradientCard>
             </>
           )}
 
           {/* 说明 */}
-          <View className="bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
+          <GradientCard variant="sky" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
               * 八字命理为传统文化，仅供参考娱乐，不具有科学依据。
               如需专业分析请咨询专业命理师。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

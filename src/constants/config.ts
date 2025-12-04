@@ -48,6 +48,7 @@ export const API_CONFIG = {
       REFRESH: '/auth/refresh',
       FORGOT_PASSWORD: '/auth/forgot-password',
       RESET_PASSWORD: '/auth/reset-password',
+      SEND_SMS: '/sms/send',
     },
 
     // 用户相关

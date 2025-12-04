@@ -1,37 +1,38 @@
-import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native';
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 渐变卡片组件 - 方案A设计系统
+ * 支持6种渐变颜色变体、悬浮动画
+ */
+
+import React from 'react';
+import { View, TouchableOpacity, ViewProps } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { Pressable } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { Gradients } from '@/constants/colors';
 
-export type GradientVariant = 'pink' | 'blue' | 'mint' | 'sunset' | 'warm' | 'white';
+const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-interface GradientCardProps {
+interface GradientCardProps extends ViewProps {
+  variant?: 'pink' | 'lavender' | 'mint' | 'sky' | 'butter' | 'white';
   children: React.ReactNode;
-  variant?: GradientVariant;
-  style?: StyleProp<ViewStyle>;
   onPress?: () => void;
-  animated?: boolean;
+  hover?: boolean;
 }
 
-const GRADIENTS: Record<GradientVariant, string[]> = {
-  pink: ['#fdf2f8', '#fce7f3'],
-  blue: ['#f0f9ff', '#e0f2fe'],
-  mint: ['#f0fdf4', '#dcfce7'],
-  sunset: ['#fef7f0', '#fdf2f8'],
-  warm: ['#fffbf5', '#fef7f0'],
-  white: ['#ffffff', '#fafafa'],
-};
-
-const SHADOW_COLORS: Record<GradientVariant, string> = {
-  pink: 'rgba(236, 72, 153, 0.15)',
-  blue: 'rgba(14, 165, 233, 0.15)',
-  mint: 'rgba(34, 197, 94, 0.15)',
-  sunset: 'rgba(231, 111, 81, 0.15)',
-  warm: 'rgba(231, 111, 81, 0.1)',
-  white: 'rgba(0, 0, 0, 0.08)',
-};
-
-export default function GradientCard({ children, variant = 'white', style, onPress, animated = true }: GradientCardProps) {
+export const GradientCard: React.FC<GradientCardProps> = ({
+  variant = 'white',
+  children,
+  onPress,
+  hover = true,
+  style,
+  className = '',
+  ...props
+}) => {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -39,46 +40,82 @@ export default function GradientCard({ children, variant = 'white', style, onPre
   }));
 
   const handlePressIn = () => {
-    if (animated && onPress) {
-      scale.value = withSpring(0.98, { damping: 15, stiffness: 300 });
+    if (hover && onPress) {
+      scale.value = withSpring(0.98, { damping: 15 });
     }
   };
 
   const handlePressOut = () => {
-    if (animated && onPress) {
-      scale.value = withSpring(1, { damping: 15, stiffness: 300 });
+    if (hover && onPress) {
+      scale.value = withSpring(1, { damping: 15 });
     }
   };
 
-  const cardContent = (
-    <LinearGradient colors={GRADIENTS[variant]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={[styles.gradient, style]}>
+  // 渐变色配置
+  const gradients = {
+    pink: Gradients.rose,
+    lavender: Gradients.lavender,
+    mint: Gradients.mint,
+    sky: Gradients.sky,
+    butter: Gradients.butter,
+    white: ['#FFFFFF', '#FFFFFF'],
+  };
+
+  const CardContent = (
+    <View className={`p-5 ${className}`} {...props}>
       {children}
+    </View>
+  );
+
+  // 白色卡片（非渐变）
+  if (variant === 'white') {
+    if (onPress) {
+      return (
+        <AnimatedTouchable
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          activeOpacity={0.9}
+          style={[animatedStyle, style]}
+          className="bg-white rounded-2xl shadow-md"
+        >
+          {CardContent}
+        </AnimatedTouchable>
+      );
+    }
+    return (
+      <View className="bg-white rounded-2xl shadow-md" style={style}>
+        {CardContent}
+      </View>
+    );
+  }
+
+  // 渐变卡片
+  const GradientWrapper = (
+    <LinearGradient
+      colors={gradients[variant]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      className="rounded-2xl shadow-md"
+      style={style}
+    >
+      {CardContent}
     </LinearGradient>
   );
 
   if (onPress) {
     return (
-      <Animated.View style={[styles.container, { shadowColor: SHADOW_COLORS[variant] }, animatedStyle]}>
-        <Pressable onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut}>
-          {cardContent}
-        </Pressable>
-      </Animated.View>
+      <AnimatedTouchable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.9}
+        style={animatedStyle}
+      >
+        {GradientWrapper}
+      </AnimatedTouchable>
     );
   }
 
-  return <View style={[styles.container, { shadowColor: SHADOW_COLORS[variant] }]}>{cardContent}</View>;
-}
-
-const styles = StyleSheet.create({
-  container: {
-    borderRadius: 16,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  gradient: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-});
+  return <Animated.View style={animatedStyle}>{GradientWrapper}</Animated.View>;
+};

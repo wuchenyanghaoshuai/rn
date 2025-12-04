@@ -1,3 +1,9 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 喂养方案工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
@@ -6,7 +12,10 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Milk, Clock, Heart, Lightbulb, AppleIcon, AlertCircle } from 'lucide-react-native';
+import { GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface FeedingPlan {
   ageRange: string;
@@ -117,25 +126,30 @@ export default function FeedingPlanScreen() {
   const plan = feedingPlans[selectedAge];
 
   return (
-    <>
-      <Stack.Screen options={{ title: '喂养方案' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '喂养方案',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 年龄选择器 */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5 -mx-5 px-5">
             <View className="flex-row gap-2">
               {feedingPlans.map((p, index) => (
                 <TouchableOpacity
                   key={index}
-                  className={`px-4 py-2 rounded-full ${
-                    selectedAge === index ? 'bg-primary-500' : 'bg-white'
+                  className={`px-4 py-2.5 rounded-full ${
+                    selectedAge === index ? 'bg-primary-400' : 'bg-white'
                   }`}
                   onPress={() => setSelectedAge(index)}
                 >
                   <Text
                     className={`font-medium ${
-                      selectedAge === index ? 'text-white' : 'text-gray-600'
+                      selectedAge === index ? 'text-white' : 'text-neutral-600'
                     }`}
                   >
                     {p.ageRange}
@@ -146,69 +160,69 @@ export default function FeedingPlanScreen() {
           </ScrollView>
 
           {/* 主要信息卡片 */}
-          <View className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white/80 text-sm">{plan.ageRange} 宝宝喂养指南</Text>
-            <Text className="text-white text-2xl font-bold mt-2">{plan.mainFood}</Text>
-          </View>
+          <GradientCard variant="butter" className="p-5 mb-5">
+            <Text className="text-neutral-700 text-sm">{plan.ageRange} 宝宝喂养指南</Text>
+            <Text className="text-neutral-800 text-2xl font-bold mt-2">{plan.mainFood}</Text>
+          </GradientCard>
 
           {/* 奶量和餐次 */}
-          <View className="flex-row gap-3 mb-4">
-            <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm">
+          <View className="flex-row gap-3 mb-5">
+            <GradientCard variant="white" className="flex-1 p-4">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="water-outline" size={20} color="#3b82f6" />
-                <Text className="text-gray-600 text-sm ml-1">奶量</Text>
+                <Milk size={20} color={Colors.sky.DEFAULT} />
+                <Text className="text-neutral-600 text-sm ml-1">奶量</Text>
               </View>
-              <Text className="text-gray-800 font-medium">{plan.milkAmount}</Text>
-            </View>
-            <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm">
+              <Text className="text-neutral-800 font-medium leading-5">{plan.milkAmount}</Text>
+            </GradientCard>
+            <GradientCard variant="white" className="flex-1 p-4">
               <View className="flex-row items-center mb-2">
-                <Ionicons name="time-outline" size={20} color="#22c55e" />
-                <Text className="text-gray-600 text-sm ml-1">餐次</Text>
+                <Clock size={20} color={Colors.mint.DEFAULT} />
+                <Text className="text-neutral-600 text-sm ml-1">餐次</Text>
               </View>
-              <Text className="text-gray-800 font-medium">{plan.mealFrequency}</Text>
-            </View>
+              <Text className="text-neutral-800 font-medium leading-5">{plan.mealFrequency}</Text>
+            </GradientCard>
           </View>
 
           {/* 营养补充 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+          <GradientCard variant="rose" className="p-5 mb-5">
             <View className="flex-row items-center mb-3">
-              <Ionicons name="medkit-outline" size={20} color="#ef4444" />
-              <Text className="text-gray-800 font-bold ml-2">营养补充</Text>
+              <Heart size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">营养补充</Text>
             </View>
             <View className="gap-2">
               {plan.supplements.map((supplement, index) => (
                 <View key={index} className="flex-row items-center">
-                  <View className="w-2 h-2 bg-red-400 rounded-full" />
-                  <Text className="text-gray-700 ml-2">{supplement}</Text>
+                  <View className="w-2 h-2 bg-neutral-700 rounded-full" />
+                  <Text className="text-neutral-700 ml-2">{supplement}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 喂养建议 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+          <GradientCard variant="mint" className="p-5 mb-5">
             <View className="flex-row items-center mb-3">
-              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-              <Text className="text-gray-800 font-bold ml-2">喂养建议</Text>
+              <Lightbulb size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">喂养建议</Text>
             </View>
             <View className="gap-3">
               {plan.tips.map((tip, index) => (
                 <View key={index} className="flex-row">
-                  <View className="w-5 h-5 bg-amber-100 rounded-full items-center justify-center mt-0.5">
-                    <Text className="text-amber-600 text-xs font-bold">{index + 1}</Text>
+                  <View className="w-6 h-6 bg-white/60 rounded-full items-center justify-center mt-0.5 flex-shrink-0">
+                    <Text className="text-neutral-800 text-xs font-bold">{index + 1}</Text>
                   </View>
-                  <Text className="text-gray-600 flex-1 ml-2 leading-5">{tip}</Text>
+                  <Text className="text-neutral-700 flex-1 ml-2 leading-5">{tip}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 辅食添加顺序（特定月龄显示） */}
           {selectedAge >= 1 && selectedAge <= 4 && (
-            <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+            <GradientCard variant="white" className="p-5 mb-5">
               <View className="flex-row items-center mb-3">
-                <Ionicons name="nutrition-outline" size={20} color="#22c55e" />
-                <Text className="text-gray-800 font-bold ml-2">辅食添加建议</Text>
+                <AppleIcon size={20} color={Colors.mint.DEFAULT} />
+                <Text className="text-neutral-800 font-bold ml-2">辅食添加建议</Text>
               </View>
               <View className="gap-2">
                 {[
@@ -221,39 +235,38 @@ export default function FeedingPlanScreen() {
                 ].map((item, index) => (
                   <View
                     key={index}
-                    className="flex-row items-center bg-green-50 rounded-lg p-3"
+                    className="flex-row items-center bg-mint-light rounded-xl p-3"
                   >
                     <Text className="text-xl">{item.icon}</Text>
-                    <Text className="text-green-700 ml-2">{item.food}</Text>
+                    <Text className="text-neutral-800 ml-2">{item.food}</Text>
                   </View>
                 ))}
               </View>
-            </View>
+            </GradientCard>
           )}
 
           {/* 注意事项 */}
-          <View className="bg-red-50 rounded-xl p-4">
+          <GradientCard variant="rose" className="p-4 mb-5">
             <View className="flex-row items-center mb-2">
-              <Ionicons name="warning-outline" size={20} color="#ef4444" />
-              <Text className="text-red-700 font-bold ml-2">注意事项</Text>
+              <AlertCircle size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-semibold ml-2">注意事项</Text>
             </View>
-            <Text className="text-red-600 text-sm leading-5">
+            <Text className="text-neutral-700 text-sm leading-5">
               • 1岁前不加盐、糖、蜂蜜{'\n'}
               • 注意食物过敏，逐一添加新食物{'\n'}
               • 避免整粒坚果等窒息风险食物{'\n'}
               • 如有特殊情况请咨询儿科医生
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 底部说明 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
-              * 以上为一般性建议，具体喂养方案请根据宝宝实际情况，
-              并在儿科医生或营养师指导下进行调整。
+          <GradientCard variant="lavender" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
+              * 以上为一般性建议，具体喂养方案请根据宝宝实际情况，并在儿科医生或营养师指导下进行调整。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

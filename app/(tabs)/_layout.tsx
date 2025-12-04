@@ -1,5 +1,11 @@
+/**
+ * @author Julian Wu
+ * @date 2024-12-03
+ * @description 底部Tab导航布局 - 使用Lucide图标 + 胶囊指示器设计
+ */
+
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { Sparkles } from 'lucide-react-native';
 import { View, Text, Pressable, StyleSheet, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNotificationStore } from '../../src/stores/notification';
@@ -7,6 +13,8 @@ import { useAuthStore } from '../../src/stores/auth';
 import { useEffect } from 'react';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TabBarIcon, TabIconName } from '../../src/components/navigation';
+import { Colors } from '../../src/constants/colors';
 
 interface RouteState {
   key: string;
@@ -25,22 +33,27 @@ interface TabBarProps {
   descriptors: Record<string, unknown>;
 }
 
-type IconName = keyof typeof Ionicons.glyphMap;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CustomTabBarProps = any;
 
 interface TabConfig {
   name: string;
+  iconKey: TabIconName;
   title: string;
-  icon: IconName;
-  iconFocused: IconName;
 }
 
 const TAB_CONFIG: TabConfig[] = [
-  { name: 'index', title: '首页', icon: 'home-outline', iconFocused: 'home' },
-  { name: 'articles', title: '文章', icon: 'document-text-outline', iconFocused: 'document-text' },
-  { name: 'ai', title: '问AI', icon: 'sparkles-outline', iconFocused: 'sparkles' },
-  { name: 'square', title: '广场', icon: 'chatbubbles-outline', iconFocused: 'chatbubbles' },
-  { name: 'profile', title: '我的', icon: 'person-outline', iconFocused: 'person' },
+  { name: 'index', iconKey: 'home', title: '首页' },
+  { name: 'articles', iconKey: 'articles', title: '文章' },
+  { name: 'ai', iconKey: 'ai', title: '问AI' },
+  { name: 'square', iconKey: 'square', title: '广场' },
+  { name: 'profile', iconKey: 'profile', title: '我的' },
 ];
+
+const TAB_COLORS = {
+  active: Colors.primary[400],
+  inactive: '#9CA3AF',
+};
 
 export default function TabLayout() {
   const stats = useNotificationStore((state) => state.stats);
@@ -59,13 +72,13 @@ export default function TabLayout() {
       screenOptions={{
         headerStyle: {
           backgroundColor: '#fff',
-          shadowColor: 'rgba(236, 72, 153, 0.1)',
+          shadowColor: 'rgba(255, 155, 138, 0.1)',
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 1,
           shadowRadius: 8,
           elevation: 4,
         },
-        headerTintColor: '#ec4899',
+        headerTintColor: Colors.primary[400],
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 18,
@@ -79,7 +92,7 @@ export default function TabLayout() {
           title: '首页',
           headerTitle: 'GoDad',
           headerTitleStyle: {
-            color: '#ec4899',
+            color: Colors.primary[500],
             fontWeight: '800',
             fontSize: 22,
           },
@@ -101,7 +114,7 @@ export default function TabLayout() {
           title: '问AI',
           headerTitle: 'AI助手',
           headerTitleStyle: {
-            color: '#ec4899',
+            color: Colors.primary[500],
             fontWeight: '700',
           },
         }}
@@ -126,7 +139,6 @@ export default function TabLayout() {
           },
         }}
       />
-      {/* 隐藏工具Tab，但保留页面可从其他入口访问 */}
       <Tabs.Screen
         name="tools"
         options={{
@@ -138,14 +150,13 @@ export default function TabLayout() {
   );
 }
 
-function CustomTabBar({ state, descriptors, navigation, unreadCount }: TabBarProps & { unreadCount: number }) {
+function CustomTabBar({ state, descriptors, navigation, unreadCount }: CustomTabBarProps & { unreadCount: number }) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = Math.max(insets.bottom, 10);
+  const bottomPadding = Math.max(insets.bottom, 8);
 
   return (
     <View style={[styles.tabBarContainer, { paddingBottom: bottomPadding }]}>
-      {state.routes.map((route, index) => {
-        // 跳过隐藏的 tools tab
+      {state.routes.map((route: RouteState, index: number) => {
         if (route.name === 'tools') return null;
 
         const isFocused = state.index === index;
@@ -183,32 +194,41 @@ function CustomTabBar({ state, descriptors, navigation, unreadCount }: TabBarPro
   );
 }
 
-function TabItem({ config, focused, onPress, badge }: { config: TabConfig; focused: boolean; onPress: () => void; badge?: number }) {
+interface TabItemProps {
+  config: TabConfig;
+  focused: boolean;
+  onPress: () => void;
+  badge?: number;
+}
+
+function TabItem({ config, focused, onPress, badge }: TabItemProps) {
   const scale = useSharedValue(1);
-  const animatedStyle = useAnimatedStyle(() => ({
+
+  const color = focused ? TAB_COLORS.active : TAB_COLORS.inactive;
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.92, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
+  const containerStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
-
-  const color = focused ? '#ec4899' : '#9ca3af';
-  const iconName = focused ? config.iconFocused : config.icon;
 
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.9, { damping: 15, stiffness: 400 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 400 }); }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={styles.tabItem}
     >
-      <Animated.View style={[styles.tabItemInner, animatedStyle]}>
-        <View style={styles.iconWrapper}>
-          {focused ? (
-            <LinearGradient colors={['rgba(236, 72, 153, 0.15)', 'rgba(236, 72, 153, 0.05)']} style={styles.activeIconBg}>
-              <Ionicons name={iconName} size={22} color={color} />
-            </LinearGradient>
-          ) : (
-            <Ionicons name={iconName} size={22} color={color} />
-          )}
-          {badge !== undefined && (
+      <Animated.View style={[styles.tabItemInner, containerStyle]}>
+        <View style={styles.iconContainer}>
+          <TabBarIcon name={config.iconKey} focused={focused} color={color} />
+          {badge !== undefined && badge > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{badge > 99 ? '99+' : badge}</Text>
             </View>
@@ -222,6 +242,15 @@ function TabItem({ config, focused, onPress, badge }: { config: TabConfig; focus
 
 function AITabButton({ focused, onPress }: { focused: boolean; onPress: () => void }) {
   const scale = useSharedValue(1);
+
+  const handlePressIn = () => {
+    scale.value = withSpring(0.9, { damping: 15, stiffness: 400 });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, { damping: 15, stiffness: 400 });
+  };
+
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
   }));
@@ -229,18 +258,18 @@ function AITabButton({ focused, onPress }: { focused: boolean; onPress: () => vo
   return (
     <Pressable
       onPress={onPress}
-      onPressIn={() => { scale.value = withSpring(0.9, { damping: 15, stiffness: 400 }); }}
-      onPressOut={() => { scale.value = withSpring(1, { damping: 15, stiffness: 400 }); }}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       style={styles.aiTabItem}
     >
       <Animated.View style={[styles.aiButtonWrapper, animatedStyle]}>
         <LinearGradient
-          colors={focused ? ['#ec4899', '#db2777'] : ['#f472b6', '#ec4899']}
+          colors={focused ? [Colors.primary[500], Colors.primary[600]] : [Colors.primary[400], Colors.primary[500]]}
           style={styles.aiButton}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <Ionicons name="sparkles" size={26} color="#fff" />
+          <Sparkles size={24} color="#fff" strokeWidth={2} />
         </LinearGradient>
       </Animated.View>
       <Text style={[styles.aiLabel, focused && styles.aiLabelFocused]}>问AI</Text>
@@ -252,14 +281,14 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: 'row',
     backgroundColor: '#fff',
-    paddingTop: 8,
+    paddingTop: 4,
     alignItems: 'flex-end',
     justifyContent: 'space-around',
-    shadowColor: 'rgba(236, 72, 153, 0.15)',
+    shadowColor: 'rgba(255, 155, 138, 0.12)',
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowRadius: 16,
+    elevation: 12,
     borderTopWidth: 0,
   },
   tabItem: {
@@ -270,40 +299,30 @@ const styles = StyleSheet.create({
   tabItemInner: {
     alignItems: 'center',
   },
-  iconWrapper: {
+  iconContainer: {
     position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 32,
-  },
-  activeIconBg: {
-    width: 44,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   tabLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 4,
+    fontSize: 10,
+    fontWeight: '500',
+    marginTop: 2,
   },
   badge: {
     position: 'absolute',
-    top: -4,
+    top: -6,
     right: -10,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: '#ec4899',
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: Colors.primary[500],
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 4,
   },
   badgeText: {
     color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 9,
+    fontWeight: '700',
   },
   aiTabItem: {
     flex: 1,
@@ -311,37 +330,38 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   aiButtonWrapper: {
-    marginTop: -24,
+    marginTop: -18,
   },
   aiButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#ec4899',
+    shadowColor: Colors.primary[500],
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
     ...Platform.select({
       ios: {
-        borderWidth: 4,
+        borderWidth: 3,
         borderColor: '#fff',
       },
       android: {
-        borderWidth: 3,
+        borderWidth: 2,
         borderColor: '#fff',
       },
     }),
   },
   aiLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#9ca3af',
-    marginTop: 4,
+    fontSize: 10,
+    fontWeight: '500',
+    color: '#9CA3AF',
+    marginTop: 2,
   },
   aiLabelFocused: {
-    color: '#ec4899',
+    color: Colors.primary[400],
+    fontWeight: '600',
   },
 });

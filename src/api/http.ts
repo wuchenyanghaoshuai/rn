@@ -47,6 +47,7 @@ const createHttpClient = (): AxiosInstance => {
     timeout: API_CONFIG.TIMEOUT,
     headers: {
       'Content-Type': 'application/json',
+      'X-Client-Type': 'app',
     },
   });
 
@@ -112,10 +113,21 @@ const createHttpClient = (): AxiosInstance => {
       }
 
       // 格式化错误
+      const data = error.response?.data as any;
+      // v2 接口 error 可能是对象，尝试提取 message
+      const err = data?.error;
+      let message = '请求失败';
+      if (typeof err === 'string') {
+        message = err;
+      } else if (err?.message) {
+        message = err.message;
+      } else if (data?.message) {
+        message = data.message;
+      }
       const errorResponse = {
         code: error.response?.status || 500,
-        message: (error.response?.data as any)?.message || error.message || '网络错误',
-        data: (error.response?.data as any)?.data,
+        message,
+        data: data?.data,
       };
 
       return Promise.reject(errorResponse);

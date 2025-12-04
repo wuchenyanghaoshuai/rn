@@ -2,6 +2,24 @@
 
 buildscript {
   repositories {
+    // 使用阿里云镜像加速（优先级最高）
+    maven {
+      url 'https://maven.aliyun.com/repository/google'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/public'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/central'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/jcenter'
+      allowInsecureProtocol = false
+    }
+    // 备用仓库
     google()
     mavenCentral()
   }
@@ -14,6 +32,24 @@ buildscript {
 
 allprojects {
   repositories {
+    // 使用阿里云镜像加速（优先级最高）
+    maven {
+      url 'https://maven.aliyun.com/repository/google'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/public'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/central'
+      allowInsecureProtocol = false
+    }
+    maven {
+      url 'https://maven.aliyun.com/repository/jcenter'
+      allowInsecureProtocol = false
+    }
+    // 备用仓库
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }

@@ -1,14 +1,16 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 身高预测工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, ScrollView, Alert } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { TrendingUp, Ruler } from 'lucide-react-native';
+import { Input, Button, GradientCard, Radio } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 export default function HeightPredictionScreen() {
   const [fatherHeight, setFatherHeight] = useState('');
@@ -33,17 +35,13 @@ export default function HeightPredictionScreen() {
       return;
     }
 
-    // 使用 FPH (Father-Plus-Mother) 公式
     let predicted: number;
     if (gender === 'male') {
-      // 男孩 = (父亲身高 + 母亲身高 + 13) / 2
       predicted = (father + mother + 13) / 2;
     } else {
-      // 女孩 = (父亲身高 + 母亲身高 - 13) / 2
       predicted = (father + mother - 13) / 2;
     }
 
-    // ±5cm 的误差范围
     setResult({
       predicted: Math.round(predicted * 10) / 10,
       range: [Math.round((predicted - 5) * 10) / 10, Math.round((predicted + 5) * 10) / 10],
@@ -57,155 +55,69 @@ export default function HeightPredictionScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '身高预测' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '身高预测',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
-          {/* 说明卡片 */}
-          <View className="bg-gradient-to-r from-secondary-500 to-secondary-400 rounded-2xl p-5 mb-6">
-            <View className="flex-row items-center">
-              <Ionicons name="analytics-outline" size={24} color="#fff" />
-              <Text className="text-white text-lg font-bold ml-2">科学预测身高</Text>
+      <ScrollView className="flex-1">
+        <View className="p-5">
+          <GradientCard variant="mint" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <TrendingUp size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">科学预测身高</Text>
             </View>
-            <Text className="text-white/80 mt-2 text-sm leading-5">
+            <Text className="text-neutral-700 text-sm leading-5">
               根据父母身高，使用国际通用的 FPH 公式预测孩子成年后的身高范围。
             </Text>
-          </View>
+          </GradientCard>
 
-          {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            {/* 性别选择 */}
+          <GradientCard variant="white" className="p-5">
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">孩子性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">孩子性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl flex-row items-center justify-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Ionicons
-                    name="male"
-                    size={20}
-                    color={gender === 'male' ? '#fff' : '#6b7280'}
-                  />
-                  <Text
-                    className={`ml-2 font-medium ${
-                      gender === 'male' ? 'text-white' : 'text-gray-600'
-                    }`}
-                  >
-                    男孩
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl flex-row items-center justify-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Ionicons
-                    name="female"
-                    size={20}
-                    color={gender === 'female' ? '#fff' : '#6b7280'}
-                  />
-                  <Text
-                    className={`ml-2 font-medium ${
-                      gender === 'female' ? 'text-white' : 'text-gray-600'
-                    }`}
-                  >
-                    女孩
-                  </Text>
-                </TouchableOpacity>
+                <Radio selected={gender === 'male'} onSelect={() => setGender('male')} label="男孩" className="flex-1" />
+                <Radio selected={gender === 'female'} onSelect={() => setGender('female')} label="女孩" className="flex-1" />
               </View>
             </View>
 
-            {/* 父亲身高 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">父亲身高 (cm)</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入父亲身高"
-                placeholderTextColor="#9ca3af"
-                value={fatherHeight}
-                onChangeText={setFatherHeight}
-                keyboardType="decimal-pad"
-                maxLength={5}
-              />
-            </View>
+            <Input label="父亲身高 (cm)" placeholder="请输入父亲身高" value={fatherHeight} onChangeText={setFatherHeight} keyboardType="decimal-pad" icon={<Ruler size={20} color={Colors.neutral[400]} />} className="mb-4" />
+            <Input label="母亲身高 (cm)" placeholder="请输入母亲身高" value={motherHeight} onChangeText={setMotherHeight} keyboardType="decimal-pad" icon={<Ruler size={20} color={Colors.neutral[400]} />} className="mb-5" />
 
-            {/* 母亲身高 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">母亲身高 (cm)</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入母亲身高"
-                placeholderTextColor="#9ca3af"
-                value={motherHeight}
-                onChangeText={setMotherHeight}
-                keyboardType="decimal-pad"
-                maxLength={5}
-              />
-            </View>
-
-            {/* 计算按钮 */}
             <View className="flex-row gap-3">
-              <TouchableOpacity
-                className="flex-1 bg-gray-100 py-4 rounded-xl items-center"
-                onPress={reset}
-              >
-                <Text className="text-gray-600 font-medium">重置</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="flex-2 bg-primary-500 py-4 rounded-xl items-center px-8"
-                onPress={calculateHeight}
-              >
-                <Text className="text-white font-semibold">计算预测</Text>
-              </TouchableOpacity>
+              <Button variant="primary" size="lg" onPress={calculateHeight} icon={<TrendingUp size={20} color="white" />} className="flex-1">开始预测</Button>
+              <Button variant="outline" size="lg" onPress={reset}>重置</Button>
             </View>
-          </View>
+          </GradientCard>
 
-          {/* 结果显示 */}
           {result && (
-            <View className="mt-6 bg-white rounded-2xl p-6 shadow-sm items-center">
-              <Text className="text-gray-500">预测成年身高</Text>
-              <View className="flex-row items-end mt-2">
-                <Text className="text-5xl font-bold text-primary-500">
-                  {result.predicted}
-                </Text>
-                <Text className="text-xl text-gray-400 mb-2 ml-1">cm</Text>
+            <GradientCard variant="sky" className="p-5 mt-5">
+              <Text className="text-neutral-800 font-bold text-lg mb-4">预测结果</Text>
+              <View className="items-center py-4">
+                <Text className="text-neutral-600 text-sm mb-2">预测成年身高</Text>
+                <Text className="text-primary-400 font-bold text-5xl mb-1">{result.predicted}</Text>
+                <Text className="text-neutral-600 text-lg">厘米 (cm)</Text>
               </View>
-              <View className="bg-gray-50 rounded-xl px-4 py-2 mt-4">
-                <Text className="text-gray-500">
-                  预测范围：{result.range[0]} - {result.range[1]} cm
+              <View className="bg-white/60 rounded-xl p-4 mt-3">
+                <Text className="text-neutral-700 text-sm text-center">
+                  身高范围：<Text className="font-semibold">{result.range[0]} - {result.range[1]} cm</Text>
                 </Text>
+                <Text className="text-neutral-600 text-xs text-center mt-2">±5cm 的浮动范围属于正常</Text>
               </View>
-
-              <View className="w-full mt-6 pt-4 border-t border-gray-100">
-                <Text className="text-gray-400 text-sm text-center leading-5">
-                  * 预测结果仅供参考，实际身高受遗传、营养、运动、睡眠等多种因素影响
-                </Text>
-              </View>
-            </View>
+            </GradientCard>
           )}
 
-          {/* 计算公式说明 */}
-          <View className="mt-6 bg-blue-50 rounded-xl p-4">
-            <View className="flex-row items-center">
-              <Ionicons name="calculator-outline" size={20} color="#3b82f6" />
-              <Text className="text-blue-700 font-medium ml-2">计算公式</Text>
-            </View>
-            <View className="mt-3">
-              <Text className="text-blue-600 text-sm">
-                男孩身高 = (父身高 + 母身高 + 13) ÷ 2
-              </Text>
-              <Text className="text-blue-600 text-sm mt-1">
-                女孩身高 = (父身高 + 母身高 - 13) ÷ 2
-              </Text>
-            </View>
-          </View>
+          <GradientCard variant="butter" className="p-4 mt-5">
+            <Text className="text-neutral-800 font-semibold mb-2">📌 温馨提示</Text>
+            <Text className="text-neutral-700 text-sm leading-5">
+              身高预测结果仅供参考，实际身高受遗传、营养、运动、睡眠等多种因素影响。
+            </Text>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

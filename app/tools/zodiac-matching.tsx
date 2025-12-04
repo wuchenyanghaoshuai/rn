@@ -1,3 +1,9 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 生肖配对工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
@@ -6,7 +12,10 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Heart, Info } from 'lucide-react-native';
+import { GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface ZodiacInfo {
   name: string;
@@ -85,10 +94,10 @@ export default function ZodiacMatchingScreen() {
       : null;
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return '#22c55e';
-    if (score >= 70) return '#f59e0b';
-    if (score >= 55) return '#3b82f6';
-    return '#ef4444';
+    if (score >= 85) return Colors.mint.DEFAULT;
+    if (score >= 70) return Colors.butter.DEFAULT;
+    if (score >= 55) return Colors.sky.DEFAULT;
+    return Colors.rose.DEFAULT;
   };
 
   const getScoreLabel = (score: number) => {
@@ -101,35 +110,43 @@ export default function ZodiacMatchingScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '生肖配对' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '生肖配对',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 介绍 */}
-          <View className="bg-gradient-to-r from-pink-500 to-rose-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">生肖配对</Text>
-            <Text className="text-white/80 mt-2 leading-5">
+          <GradientCard variant="rose" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <Heart size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">生肖配对</Text>
+            </View>
+            <Text className="text-neutral-700 leading-5">
               选择两个生肖，查看配对分析，了解彼此的相合程度。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 选择区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-3">选择第一个生肖</Text>
-            <View className="flex-row flex-wrap gap-2 mb-4">
+          <GradientCard variant="white" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-3">选择第一个生肖</Text>
+            <View className="flex-row flex-wrap gap-2 mb-5">
               {zodiacs.map((zodiac, index) => (
                 <TouchableOpacity
                   key={index}
                   className={`w-[23%] aspect-square rounded-xl items-center justify-center ${
-                    selectedZodiac1 === index ? 'bg-pink-500' : 'bg-gray-100'
+                    selectedZodiac1 === index ? 'bg-rose-DEFAULT' : 'bg-neutral-100'
                   }`}
                   onPress={() => setSelectedZodiac1(index)}
                 >
                   <Text className="text-2xl">{zodiac.emoji}</Text>
                   <Text
-                    className={`text-sm mt-1 ${
-                      selectedZodiac1 === index ? 'text-white' : 'text-gray-600'
+                    className={`text-sm mt-1 font-medium ${
+                      selectedZodiac1 === index ? 'text-white' : 'text-neutral-600'
                     }`}
                   >
                     {zodiac.name}
@@ -138,20 +155,20 @@ export default function ZodiacMatchingScreen() {
               ))}
             </View>
 
-            <Text className="text-gray-800 font-bold mb-3">选择第二个生肖</Text>
+            <Text className="text-neutral-800 font-bold text-base mb-3">选择第二个生肖</Text>
             <View className="flex-row flex-wrap gap-2">
               {zodiacs.map((zodiac, index) => (
                 <TouchableOpacity
                   key={index}
                   className={`w-[23%] aspect-square rounded-xl items-center justify-center ${
-                    selectedZodiac2 === index ? 'bg-blue-500' : 'bg-gray-100'
+                    selectedZodiac2 === index ? 'bg-sky-DEFAULT' : 'bg-neutral-100'
                   }`}
                   onPress={() => setSelectedZodiac2(index)}
                 >
                   <Text className="text-2xl">{zodiac.emoji}</Text>
                   <Text
-                    className={`text-sm mt-1 ${
-                      selectedZodiac2 === index ? 'text-white' : 'text-gray-600'
+                    className={`text-sm mt-1 font-medium ${
+                      selectedZodiac2 === index ? 'text-white' : 'text-neutral-600'
                     }`}
                   >
                     {zodiac.name}
@@ -159,25 +176,25 @@ export default function ZodiacMatchingScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && selectedZodiac1 !== null && selectedZodiac2 !== null && (
-            <View className="bg-white rounded-2xl p-6 shadow-sm mb-4">
+            <GradientCard variant="lavender" className="p-6 mb-5">
               {/* 配对展示 */}
               <View className="flex-row items-center justify-center mb-6">
                 <View className="items-center">
                   <Text className="text-5xl">{zodiacs[selectedZodiac1].emoji}</Text>
-                  <Text className="text-gray-700 font-medium mt-1">
+                  <Text className="text-neutral-800 font-medium mt-1">
                     {zodiacs[selectedZodiac1].name}
                   </Text>
                 </View>
                 <View className="mx-6">
-                  <Ionicons name="heart" size={32} color="#ec4899" />
+                  <Heart size={32} color={Colors.rose.DEFAULT} fill={Colors.rose.DEFAULT} />
                 </View>
                 <View className="items-center">
                   <Text className="text-5xl">{zodiacs[selectedZodiac2].emoji}</Text>
-                  <Text className="text-gray-700 font-medium mt-1">
+                  <Text className="text-neutral-800 font-medium mt-1">
                     {zodiacs[selectedZodiac2].name}
                   </Text>
                 </View>
@@ -185,7 +202,7 @@ export default function ZodiacMatchingScreen() {
 
               {/* 分数 */}
               <View className="items-center mb-4">
-                <Text className="text-gray-500 mb-2">配对指数</Text>
+                <Text className="text-neutral-600 mb-2">配对指数</Text>
                 <Text
                   className="text-6xl font-bold"
                   style={{ color: getScoreColor(result.score) }}
@@ -193,8 +210,7 @@ export default function ZodiacMatchingScreen() {
                   {result.score}
                 </Text>
                 <View
-                  className="px-4 py-1 rounded-full mt-2"
-                  style={{ backgroundColor: `${getScoreColor(result.score)}20` }}
+                  className="px-4 py-1.5 rounded-full mt-2 bg-white/60"
                 >
                   <Text
                     className="font-medium"
@@ -206,69 +222,72 @@ export default function ZodiacMatchingScreen() {
               </View>
 
               {/* 描述 */}
-              <View className="bg-gray-50 rounded-xl p-4">
-                <Text className="text-gray-700 text-center leading-6">
+              <View className="bg-white/60 rounded-xl p-4">
+                <Text className="text-neutral-800 text-center leading-6">
                   {result.description}
                 </Text>
               </View>
-            </View>
+            </GradientCard>
           )}
 
           {/* 生肖相合相冲 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-3">生肖相合相冲</Text>
+          <GradientCard variant="mint" className="p-5 mb-5">
+            <View className="flex-row items-center mb-4">
+              <Info size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">生肖相合相冲</Text>
+            </View>
 
             <View className="mb-3">
-              <Text className="text-green-600 font-medium mb-2">六合（最佳配对）</Text>
-              <Text className="text-gray-600 text-sm">
+              <Text className="text-neutral-800 font-semibold mb-2">六合（最佳配对）</Text>
+              <Text className="text-neutral-700 text-sm leading-5">
                 鼠牛、虎猪、兔狗、龙鸡、蛇猴、马羊
               </Text>
             </View>
 
             <View className="mb-3">
-              <Text className="text-blue-600 font-medium mb-2">三合（相生互助）</Text>
-              <Text className="text-gray-600 text-sm">
+              <Text className="text-neutral-800 font-semibold mb-2">三合（相生互助）</Text>
+              <Text className="text-neutral-700 text-sm leading-5">
                 猴鼠龙、虎马狗、蛇鸡牛、猪兔羊
               </Text>
             </View>
 
             <View>
-              <Text className="text-red-500 font-medium mb-2">六冲（相冲相克）</Text>
-              <Text className="text-gray-600 text-sm">
+              <Text className="text-neutral-800 font-semibold mb-2">六冲（相冲相克）</Text>
+              <Text className="text-neutral-700 text-sm leading-5">
                 鼠马、牛羊、虎猴、兔鸡、龙狗、蛇猪
               </Text>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 生肖性格简介 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold mb-3">十二生肖性格</Text>
+          <GradientCard variant="white" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-3">十二生肖性格</Text>
             <View className="gap-2">
               {zodiacs.map((zodiac, index) => (
                 <View
                   key={index}
-                  className="flex-row items-center py-2 border-b border-gray-100 last:border-b-0"
+                  className="flex-row items-center py-2.5 border-b border-neutral-100 last:border-b-0"
                 >
                   <Text className="text-xl mr-2">{zodiac.emoji}</Text>
-                  <Text className="text-gray-700 font-medium w-8">{zodiac.name}</Text>
-                  <Text className="text-gray-500 flex-1 ml-2">
+                  <Text className="text-neutral-800 font-medium w-8">{zodiac.name}</Text>
+                  <Text className="text-neutral-600 flex-1 ml-2">
                     {zodiac.personality}
                   </Text>
-                  <Text className="text-gray-400 text-xs">{zodiac.years}</Text>
+                  <Text className="text-neutral-400 text-xs">{zodiac.years}</Text>
                 </View>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 提示 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
+          <GradientCard variant="butter" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
               * 生肖配对仅供娱乐参考，感情需要双方共同经营，
               不应以生肖论断感情好坏。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

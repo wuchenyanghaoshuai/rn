@@ -1,12 +1,20 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 年龄计算器工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Calendar, Cake, Star } from 'lucide-react-native';
+import { Input, GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 export default function AgeCalculatorScreen() {
   const [year, setYear] = useState('');
@@ -105,139 +113,141 @@ export default function AgeCalculatorScreen() {
   const result = calculateAge();
 
   return (
-    <>
-      <Stack.Screen options={{ title: '年龄计算' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '年龄计算',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 日期输入 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold text-lg mb-4">选择出生日期</Text>
+          <GradientCard variant="white" className="p-5">
+            <View className="flex-row items-center mb-4">
+              <Calendar size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold text-lg ml-2">选择出生日期</Text>
+            </View>
 
             <View className="flex-row gap-3">
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm mb-1">年</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">年</Text>
+                <Input
                   placeholder="2020"
-                  placeholderTextColor="#9ca3af"
                   value={year}
                   onChangeText={setYear}
                   keyboardType="number-pad"
-                  maxLength={4}
+                  className="text-center"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm mb-1">月</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">月</Text>
+                <Input
                   placeholder="1"
-                  placeholderTextColor="#9ca3af"
                   value={month}
                   onChangeText={setMonth}
                   keyboardType="number-pad"
-                  maxLength={2}
+                  className="text-center"
                 />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-500 text-sm mb-1">日</Text>
-                <TextInput
-                  className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-center"
+                <Text className="text-neutral-600 text-sm mb-2">日</Text>
+                <Input
                   placeholder="1"
-                  placeholderTextColor="#9ca3af"
                   value={day}
                   onChangeText={setDay}
                   keyboardType="number-pad"
-                  maxLength={2}
+                  className="text-center"
                 />
               </View>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && (
             <>
               {/* 主要年龄 */}
-              <View className="mt-6 bg-gradient-to-r from-primary-500 to-primary-400 rounded-2xl p-6 items-center">
-                <Text className="text-white/80">宝宝已经</Text>
+              <GradientCard variant="mint" className="mt-5 p-6 items-center">
+                <Text className="text-neutral-700 text-sm">宝宝已经</Text>
                 <View className="flex-row items-end mt-2">
                   {result.years > 0 && (
                     <>
-                      <Text className="text-white text-5xl font-bold">{result.years}</Text>
-                      <Text className="text-white text-xl mb-2 ml-1">岁</Text>
+                      <Text className="text-neutral-800 text-5xl font-bold">{result.years}</Text>
+                      <Text className="text-neutral-700 text-xl mb-2 ml-1">岁</Text>
                     </>
                   )}
                   {result.months > 0 && (
                     <>
-                      <Text className="text-white text-5xl font-bold ml-2">{result.months}</Text>
-                      <Text className="text-white text-xl mb-2 ml-1">个月</Text>
+                      <Text className="text-neutral-800 text-5xl font-bold ml-2">{result.months}</Text>
+                      <Text className="text-neutral-700 text-xl mb-2 ml-1">个月</Text>
                     </>
                   )}
-                  <Text className="text-white text-5xl font-bold ml-2">{result.days}</Text>
-                  <Text className="text-white text-xl mb-2 ml-1">天</Text>
+                  <Text className="text-neutral-800 text-5xl font-bold ml-2">{result.days}</Text>
+                  <Text className="text-neutral-700 text-xl mb-2 ml-1">天</Text>
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 详细信息 */}
-              <View className="mt-4 bg-white rounded-2xl p-4 shadow-sm">
-                <Text className="text-gray-800 font-bold mb-4">详细信息</Text>
+              <GradientCard variant="white" className="p-5 mt-5">
+                <Text className="text-neutral-800 font-bold text-base mb-4">详细信息</Text>
 
                 <View className="flex-row flex-wrap gap-3">
-                  <View className="bg-blue-50 rounded-xl p-3 flex-1 min-w-[45%]">
-                    <Text className="text-blue-400 text-sm">总天数</Text>
-                    <Text className="text-blue-600 text-xl font-bold mt-1">
+                  <View className="bg-sky-light rounded-xl p-3 flex-1 min-w-[45%]">
+                    <Text className="text-neutral-700 text-sm">总天数</Text>
+                    <Text className="text-neutral-800 text-xl font-bold mt-1">
                       {result.totalDays.toLocaleString()} 天
                     </Text>
                   </View>
-                  <View className="bg-green-50 rounded-xl p-3 flex-1 min-w-[45%]">
-                    <Text className="text-green-400 text-sm">总周数</Text>
-                    <Text className="text-green-600 text-xl font-bold mt-1">
+                  <View className="bg-mint-light rounded-xl p-3 flex-1 min-w-[45%]">
+                    <Text className="text-neutral-700 text-sm">总周数</Text>
+                    <Text className="text-neutral-800 text-xl font-bold mt-1">
                       {result.totalWeeks.toLocaleString()} 周
                     </Text>
                   </View>
-                  <View className="bg-purple-50 rounded-xl p-3 flex-1 min-w-[45%]">
-                    <Text className="text-purple-400 text-sm">总月数</Text>
-                    <Text className="text-purple-600 text-xl font-bold mt-1">
+                  <View className="bg-lavender-light rounded-xl p-3 flex-1 min-w-[45%]">
+                    <Text className="text-neutral-700 text-sm">总月数</Text>
+                    <Text className="text-neutral-800 text-xl font-bold mt-1">
                       {result.totalMonths} 个月
                     </Text>
                   </View>
-                  <View className="bg-amber-50 rounded-xl p-3 flex-1 min-w-[45%]">
-                    <Text className="text-amber-400 text-sm">距下次生日</Text>
-                    <Text className="text-amber-600 text-xl font-bold mt-1">
+                  <View className="bg-butter-light rounded-xl p-3 flex-1 min-w-[45%]">
+                    <Text className="text-neutral-700 text-sm">距下次生日</Text>
+                    <Text className="text-neutral-800 text-xl font-bold mt-1">
                       {result.daysToNextBirthday} 天
                     </Text>
                   </View>
                 </View>
-              </View>
+              </GradientCard>
 
               {/* 生肖和星座 */}
-              <View className="mt-4 flex-row gap-3">
-                <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm items-center">
-                  <Ionicons name="paw-outline" size={28} color="#e76f51" />
-                  <Text className="text-gray-500 text-sm mt-2">生肖</Text>
-                  <Text className="text-gray-800 text-xl font-bold mt-1">
+              <View className="mt-5 flex-row gap-3">
+                <GradientCard variant="rose" className="flex-1 p-5 items-center">
+                  <Cake size={28} color={Colors.neutral[700]} />
+                  <Text className="text-neutral-700 text-sm mt-2">生肖</Text>
+                  <Text className="text-neutral-800 text-xl font-bold mt-1">
                     {result.zodiac}
                   </Text>
-                </View>
-                <View className="flex-1 bg-white rounded-2xl p-4 shadow-sm items-center">
-                  <Ionicons name="star-outline" size={28} color="#8b5cf6" />
-                  <Text className="text-gray-500 text-sm mt-2">星座</Text>
-                  <Text className="text-gray-800 text-xl font-bold mt-1">
+                </GradientCard>
+                <GradientCard variant="lavender" className="flex-1 p-5 items-center">
+                  <Star size={28} color={Colors.neutral[700]} />
+                  <Text className="text-neutral-700 text-sm mt-2">星座</Text>
+                  <Text className="text-neutral-800 text-xl font-bold mt-1">
                     {result.constellation}
                   </Text>
-                </View>
+                </GradientCard>
               </View>
             </>
           )}
 
           {/* 提示 */}
           {!result && year && month && day && (
-            <View className="mt-6 bg-red-50 rounded-xl p-4">
-              <Text className="text-red-600">请输入正确的出生日期</Text>
-            </View>
+            <GradientCard variant="rose" className="p-4 mt-5">
+              <Text className="text-neutral-800 font-semibold">请输入正确的出生日期</Text>
+            </GradientCard>
           )}
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

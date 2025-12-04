@@ -68,7 +68,7 @@ export const articleApi = {
   async getMyArticles(params?: ArticleListParams): Promise<ApiResponse<PaginatedResponse<Article>>> {
     return http.get<PaginatedResponse<Article>>(API_CONFIG.ENDPOINTS.ARTICLE.MY, {
       ...params,
-      self: true,
+      scope: 'me',
     });
   },
 

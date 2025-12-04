@@ -1,3 +1,9 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 家庭食谱工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
@@ -6,7 +12,18 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+  UtensilsCrossed,
+  Clock,
+  User,
+  ChevronUp,
+  ChevronDown,
+  Heart,
+  Lightbulb,
+} from 'lucide-react-native';
+import { GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface MealRecipe {
   id: string;
@@ -127,9 +144,9 @@ const recipes: MealRecipe[] = [
 
 const categories = ['全部', '主食', '荤菜', '素菜', '汤品'];
 const difficulties = {
-  easy: { label: '简单', color: '#22c55e' },
-  medium: { label: '中等', color: '#f59e0b' },
-  hard: { label: '困难', color: '#ef4444' },
+  easy: { label: '简单', color: Colors.mint.DEFAULT },
+  medium: { label: '中等', color: Colors.butter.DEFAULT },
+  hard: { label: '困难', color: Colors.rose.DEFAULT },
 };
 
 export default function FamilyMealPlanScreen() {
@@ -145,33 +162,41 @@ export default function FamilyMealPlanScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '家庭食谱' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '家庭食谱',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 介绍横幅 */}
-          <View className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">营养家庭食谱</Text>
-            <Text className="text-white/80 mt-2 leading-5">
+          <GradientCard variant="butter" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <UtensilsCrossed size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">营养家庭食谱</Text>
+            </View>
+            <Text className="text-neutral-700 leading-5">
               精选适合宝宝和全家人的营养食谱，简单易做，美味健康。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 分类筛选 */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-5 -mx-5 px-5">
             <View className="flex-row gap-2">
               {categories.map((category) => (
                 <TouchableOpacity
                   key={category}
-                  className={`px-4 py-2 rounded-full ${
-                    selectedCategory === category ? 'bg-primary-500' : 'bg-white'
+                  className={`px-4 py-2.5 rounded-full ${
+                    selectedCategory === category ? 'bg-primary-400' : 'bg-white'
                   }`}
                   onPress={() => setSelectedCategory(category)}
                 >
                   <Text
                     className={`font-medium ${
-                      selectedCategory === category ? 'text-white' : 'text-gray-600'
+                      selectedCategory === category ? 'text-white' : 'text-neutral-600'
                     }`}
                   >
                     {category}
@@ -182,13 +207,13 @@ export default function FamilyMealPlanScreen() {
           </ScrollView>
 
           {/* 食谱列表 */}
-          <View className="gap-4">
+          <View className="gap-4 mb-6">
             {filteredRecipes.map((recipe) => {
               const isExpanded = expandedRecipe === recipe.id;
               const diffConfig = difficulties[recipe.difficulty];
 
               return (
-                <View key={recipe.id} className="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <GradientCard key={recipe.id} variant="white" className="overflow-hidden">
                   {/* 食谱头部 */}
                   <TouchableOpacity
                     className="p-4"
@@ -197,15 +222,15 @@ export default function FamilyMealPlanScreen() {
                     <View className="flex-row items-center justify-between">
                       <View className="flex-1">
                         <View className="flex-row items-center">
-                          <Text className="text-gray-800 font-bold text-lg">
+                          <Text className="text-neutral-800 font-bold text-lg">
                             {recipe.name}
                           </Text>
                           <View
-                            className="ml-2 px-2 py-0.5 rounded"
-                            style={{ backgroundColor: `${diffConfig.color}20` }}
+                            className="ml-2 px-2 py-0.5 rounded-lg"
+                            style={{ backgroundColor: `${diffConfig.color}30` }}
                           >
                             <Text
-                              className="text-xs"
+                              className="text-xs font-medium"
                               style={{ color: diffConfig.color }}
                             >
                               {diffConfig.label}
@@ -214,40 +239,40 @@ export default function FamilyMealPlanScreen() {
                         </View>
                         <View className="flex-row items-center mt-2">
                           <View className="flex-row items-center">
-                            <Ionicons name="time-outline" size={14} color="#9ca3af" />
-                            <Text className="text-gray-400 text-sm ml-1">
+                            <Clock size={14} color={Colors.neutral[400]} />
+                            <Text className="text-neutral-500 text-sm ml-1">
                               {recipe.cookTime}
                             </Text>
                           </View>
                           <View className="flex-row items-center ml-4">
-                            <Ionicons name="person-outline" size={14} color="#9ca3af" />
-                            <Text className="text-gray-400 text-sm ml-1">
+                            <User size={14} color={Colors.neutral[400]} />
+                            <Text className="text-neutral-500 text-sm ml-1">
                               {recipe.ageRange}
                             </Text>
                           </View>
                         </View>
                       </View>
-                      <Ionicons
-                        name={isExpanded ? 'chevron-up' : 'chevron-down'}
-                        size={20}
-                        color="#9ca3af"
-                      />
+                      {isExpanded ? (
+                        <ChevronUp size={20} color={Colors.neutral[400]} />
+                      ) : (
+                        <ChevronDown size={20} color={Colors.neutral[400]} />
+                      )}
                     </View>
                   </TouchableOpacity>
 
                   {/* 展开的详情 */}
                   {isExpanded && (
-                    <View className="px-4 pb-4 border-t border-gray-100">
+                    <View className="px-4 pb-4 border-t border-neutral-100">
                       {/* 食材 */}
                       <View className="mt-4">
-                        <Text className="text-gray-700 font-medium mb-2">食材准备</Text>
+                        <Text className="text-neutral-700 font-semibold mb-2">食材准备</Text>
                         <View className="flex-row flex-wrap gap-2">
                           {recipe.ingredients.map((ingredient, index) => (
                             <View
                               key={index}
-                              className="bg-amber-50 px-3 py-1 rounded-full"
+                              className="bg-butter-light px-3 py-1.5 rounded-full"
                             >
-                              <Text className="text-amber-700 text-sm">{ingredient}</Text>
+                              <Text className="text-neutral-700 text-sm">{ingredient}</Text>
                             </View>
                           ))}
                         </View>
@@ -255,16 +280,16 @@ export default function FamilyMealPlanScreen() {
 
                       {/* 步骤 */}
                       <View className="mt-4">
-                        <Text className="text-gray-700 font-medium mb-2">烹饪步骤</Text>
+                        <Text className="text-neutral-700 font-semibold mb-2">烹饪步骤</Text>
                         <View className="gap-2">
                           {recipe.steps.map((step, index) => (
                             <View key={index} className="flex-row">
-                              <View className="w-5 h-5 bg-primary-100 rounded-full items-center justify-center mt-0.5">
-                                <Text className="text-primary-500 text-xs font-bold">
+                              <View className="w-5 h-5 bg-primary-light rounded-full items-center justify-center mt-0.5 flex-shrink-0">
+                                <Text className="text-primary-DEFAULT text-xs font-bold">
                                   {index + 1}
                                 </Text>
                               </View>
-                              <Text className="text-gray-600 flex-1 ml-2 leading-5">
+                              <Text className="text-neutral-700 flex-1 ml-2 leading-5">
                                 {step}
                               </Text>
                             </View>
@@ -273,37 +298,37 @@ export default function FamilyMealPlanScreen() {
                       </View>
 
                       {/* 营养 */}
-                      <View className="mt-4 bg-green-50 rounded-xl p-3">
-                        <View className="flex-row items-center">
-                          <Ionicons name="nutrition-outline" size={16} color="#22c55e" />
-                          <Text className="text-green-700 font-medium ml-1">营养特点</Text>
+                      <View className="mt-4 bg-mint-light rounded-xl p-3">
+                        <View className="flex-row items-center mb-1">
+                          <Heart size={16} color={Colors.neutral[700]} />
+                          <Text className="text-neutral-800 font-semibold ml-1.5">营养特点</Text>
                         </View>
-                        <Text className="text-green-600 text-sm mt-1">
+                        <Text className="text-neutral-700 text-sm leading-5">
                           {recipe.nutrition}
                         </Text>
                       </View>
                     </View>
                   )}
-                </View>
+                </GradientCard>
               );
             })}
           </View>
 
           {/* 烹饪小贴士 */}
-          <View className="mt-6 bg-blue-50 rounded-xl p-4">
-            <View className="flex-row items-center mb-2">
-              <Ionicons name="bulb-outline" size={20} color="#3b82f6" />
-              <Text className="text-blue-700 font-bold ml-2">烹饪小贴士</Text>
+          <GradientCard variant="sky" className="p-5">
+            <View className="flex-row items-center mb-3">
+              <Lightbulb size={20} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 font-bold ml-2">烹饪小贴士</Text>
             </View>
-            <Text className="text-blue-600 text-sm leading-5">
+            <Text className="text-neutral-700 text-sm leading-6">
               • 1岁以内宝宝的辅食不加盐{'\n'}
               • 食材要新鲜，烹饪要熟透{'\n'}
               • 根据宝宝月龄调整食物质地{'\n'}
               • 尝试新食物时观察是否过敏
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

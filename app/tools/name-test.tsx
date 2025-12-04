@@ -1,14 +1,21 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 姓名测试工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
   ScrollView,
   Alert,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Sparkles, Lightbulb } from 'lucide-react-native';
+import { Input, Button, GradientCard, Radio } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface NameAnalysis {
   totalScore: number;
@@ -30,7 +37,6 @@ export default function NameTestScreen() {
   const [result, setResult] = useState<NameAnalysis | null>(null);
 
   const analyzeCharacter = (char: string) => {
-    // 简化的字符分析逻辑
     const code = char.charCodeAt(0);
     const strokeCount = (code % 20) + 5;
     const elements = ['金', '木', '水', '火', '土'];
@@ -45,13 +51,10 @@ export default function NameTestScreen() {
     }
 
     const fullName = surname + givenName;
-
-    // 分析每个字
     const charAnalyses = fullName.split('').map(analyzeCharacter);
     const totalStrokes = charAnalyses.reduce((sum, a) => sum + a.strokeCount, 0);
     const elements = charAnalyses.map(a => a.element).join('、');
 
-    // 计算各项得分 (简化版，实际应有更复杂的算法)
     const baseScore = 60 + (totalStrokes % 30);
     const fiveElementsScore = 65 + Math.floor(Math.random() * 25);
     const soundScore = 70 + Math.floor(Math.random() * 20);
@@ -62,7 +65,6 @@ export default function NameTestScreen() {
       (fiveElementsScore + soundScore + meaningScore + structureScore) / 4
     );
 
-    // 生成分析结果
     const soundAnalyses = [
       '声调搭配和谐，朗朗上口',
       '音韵优美，富有节奏感',
@@ -105,9 +107,9 @@ export default function NameTestScreen() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return '#22c55e';
-    if (score >= 70) return '#f59e0b';
-    return '#ef4444';
+    if (score >= 85) return Colors.mint.DEFAULT;
+    if (score >= 70) return Colors.butter.DEFAULT;
+    return Colors.rose.DEFAULT;
   };
 
   const getScoreLabel = (score: number) => {
@@ -118,82 +120,73 @@ export default function NameTestScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '姓名测试' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '姓名测试',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold text-lg mb-4">输入姓名</Text>
+          <GradientCard variant="white" className="p-5">
+            <Text className="text-neutral-800 font-bold text-lg mb-4">输入姓名</Text>
 
-            {/* 性别选择 */}
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Text className={gender === 'male' ? 'text-white' : 'text-gray-600'}>
-                    男
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Text className={gender === 'female' ? 'text-white' : 'text-gray-600'}>
-                    女
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={gender === 'male'}
+                  onSelect={() => setGender('male')}
+                  label="男"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={gender === 'female'}
+                  onSelect={() => setGender('female')}
+                  label="女"
+                  className="flex-1"
+                />
               </View>
             </View>
 
-            {/* 姓氏输入 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">姓氏</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入姓氏"
-                placeholderTextColor="#9ca3af"
-                value={surname}
-                onChangeText={setSurname}
-                maxLength={2}
-              />
-            </View>
+            <Input
+              label="姓氏"
+              placeholder="请输入姓氏"
+              value={surname}
+              onChangeText={setSurname}
+              maxLength={2}
+              className="mb-4"
+            />
 
-            {/* 名字输入 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">名字</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入名字"
-                placeholderTextColor="#9ca3af"
-                value={givenName}
-                onChangeText={setGivenName}
-                maxLength={2}
-              />
-            </View>
+            <Input
+              label="名字"
+              placeholder="请输入名字"
+              value={givenName}
+              onChangeText={setGivenName}
+              maxLength={2}
+              className="mb-5"
+            />
 
-            <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center"
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               onPress={analyze}
+              icon={<Sparkles size={20} color="white" />}
             >
-              <Text className="text-white font-semibold text-lg">开始测试</Text>
-            </TouchableOpacity>
-          </View>
+              开始测试
+            </Button>
+          </GradientCard>
 
           {/* 结果显示 */}
           {result && (
             <>
               {/* 总分 */}
-              <View className="mt-6 bg-white rounded-2xl p-6 shadow-sm items-center">
-                <Text className="text-gray-500 mb-2">综合评分</Text>
+              <GradientCard variant="lavender" className="p-6 mt-5 items-center">
+                <Text className="text-neutral-600 mb-2">综合评分</Text>
                 <Text
                   className="text-6xl font-bold"
                   style={{ color: getScoreColor(result.totalScore) }}
@@ -201,8 +194,7 @@ export default function NameTestScreen() {
                   {result.totalScore}
                 </Text>
                 <View
-                  className="px-4 py-1 rounded-full mt-2"
-                  style={{ backgroundColor: `${getScoreColor(result.totalScore)}20` }}
+                  className="px-4 py-1 rounded-full mt-2 bg-white/60"
                 >
                   <Text
                     className="font-medium"
@@ -211,14 +203,14 @@ export default function NameTestScreen() {
                     {getScoreLabel(result.totalScore)}
                   </Text>
                 </View>
-                <Text className="text-gray-400 mt-3">
+                <Text className="text-neutral-700 mt-3">
                   {surname}{givenName} · 五行：{result.fiveElements}
                 </Text>
-              </View>
+              </GradientCard>
 
               {/* 详细得分 */}
-              <View className="mt-4 bg-white rounded-2xl p-4 shadow-sm">
-                <Text className="text-gray-800 font-bold mb-4">详细分析</Text>
+              <GradientCard variant="white" className="p-5 mt-5">
+                <Text className="text-neutral-800 font-bold text-base mb-4">详细分析</Text>
 
                 {[
                   { label: '五行得分', score: result.fiveElementsScore, desc: result.fiveElements },
@@ -228,10 +220,10 @@ export default function NameTestScreen() {
                 ].map((item, index) => (
                   <View
                     key={index}
-                    className="py-3 border-b border-gray-100 last:border-b-0"
+                    className="py-3 border-b border-neutral-100 last:border-b-0"
                   >
                     <View className="flex-row items-center justify-between">
-                      <Text className="text-gray-700 font-medium">{item.label}</Text>
+                      <Text className="text-neutral-800 font-medium">{item.label}</Text>
                       <Text
                         className="font-bold text-lg"
                         style={{ color: getScoreColor(item.score) }}
@@ -239,34 +231,34 @@ export default function NameTestScreen() {
                         {item.score}分
                       </Text>
                     </View>
-                    <Text className="text-gray-400 text-sm mt-1">{item.desc}</Text>
+                    <Text className="text-neutral-600 text-sm mt-1">{item.desc}</Text>
                   </View>
                 ))}
-              </View>
+              </GradientCard>
 
               {/* 建议 */}
-              <View className="mt-4 bg-amber-50 rounded-2xl p-4">
+              <GradientCard variant="butter" className="p-4 mt-5">
                 <View className="flex-row items-center mb-2">
-                  <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-                  <Text className="text-amber-700 font-bold ml-2">温馨提示</Text>
+                  <Lightbulb size={20} color={Colors.neutral[700]} />
+                  <Text className="text-neutral-800 font-semibold ml-2">温馨提示</Text>
                 </View>
                 {result.suggestions.map((suggestion, index) => (
-                  <Text key={index} className="text-amber-600 text-sm leading-5 mt-1">
+                  <Text key={index} className="text-neutral-700 text-sm leading-5 mt-1">
                     • {suggestion}
                   </Text>
                 ))}
-              </View>
+              </GradientCard>
             </>
           )}
 
           {/* 说明 */}
-          <View className="mt-6 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
+          <GradientCard variant="lavender" className="p-4 mt-5">
+            <Text className="text-neutral-700 text-sm leading-5">
               * 姓名测试仅供娱乐参考，不具有科学依据。名字的好坏更多在于父母的期望和祝福。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

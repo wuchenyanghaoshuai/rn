@@ -1,10 +1,15 @@
 import { View, Text, ScrollView, Image, Alert, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useAuthStore } from '../../src/stores/auth';
 import { useNotificationStore } from '../../src/stores/notification';
+import { userApi } from '../../src/api/user';
+import { articleApi } from '../../src/api/article';
+import type { FollowStats } from '../../src/types';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -22,6 +27,41 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { stats } = useNotificationStore();
+  const [followStats, setFollowStats] = useState<FollowStats | null>(null);
+  const [articleCount, setArticleCount] = useState<number>(0);
+
+  // 获取用户统计数据 - 每次页面获得焦点时刷新
+  useFocusEffect(
+    useCallback(() => {
+      const fetchUserStats = async () => {
+        if (isAuthenticated && user?.id) {
+          try {
+            // 获取关注统计
+            const followResponse = await userApi.getFollowStats(user.id);
+            if (followResponse.data) {
+              setFollowStats(followResponse.data);
+            }
+
+            // 获取文章数量
+            const articleResponse = await articleApi.getMyArticles({ page: 1, size: 1 }) as any;
+            // 后端返回格式可能是: { data: { articles: [...] }, pagination: { total } }
+            // 或: { data: { items: [...], total } }
+            // 或: { data: [...], total }
+            const total = articleResponse.pagination?.total
+              || articleResponse.data?.total
+              || articleResponse.total
+              || (Array.isArray(articleResponse.data?.articles) ? articleResponse.data.articles.length : 0)
+              || (Array.isArray(articleResponse.data?.items) ? articleResponse.data.items.length : 0)
+              || 0;
+            setArticleCount(total);
+          } catch (error) {
+            console.error('获取用户统计失败:', error);
+          }
+        }
+      };
+      fetchUserStats();
+    }, [isAuthenticated, user?.id])
+  );
 
   const handleLogout = () => {
     Alert.alert(
@@ -123,11 +163,11 @@ export default function ProfileScreen() {
 
         {/* 数据统计 */}
         <View style={styles.statsContainer}>
-          <StatItem label="关注" value={0} onPress={() => router.push(`/user/${user?.id}/following`)} />
+          <StatItem label="关注" value={followStats?.following_count || 0} onPress={() => router.push(`/user/${user?.id}/following`)} />
           <View style={styles.statDivider} />
-          <StatItem label="粉丝" value={0} onPress={() => router.push(`/user/${user?.id}/followers`)} />
+          <StatItem label="粉丝" value={followStats?.followers_count || 0} onPress={() => router.push(`/user/${user?.id}/followers`)} />
           <View style={styles.statDivider} />
-          <StatItem label="收藏" value={0} onPress={() => router.push('/user/favorites')} />
+          <StatItem label="文章" value={articleCount} onPress={() => router.push('/user/articles')} />
         </View>
       </View>
 

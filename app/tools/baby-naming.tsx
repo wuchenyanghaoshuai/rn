@@ -1,15 +1,16 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 宝宝起名工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Sparkles, Baby } from 'lucide-react-native';
+import { Input, Button, GradientCard, Radio, Divider } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface NameResult {
   name: string;
@@ -79,91 +80,63 @@ export default function BabyNamingScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '宝宝起名' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '宝宝起名',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
-          {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
+      <ScrollView className="flex-1">
+        <View className="p-5">
+          {/* 输入卡片 */}
+          <GradientCard variant="white" className="p-5 mb-5">
             {/* 姓氏输入 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">姓氏</Text>
-              <TextInput
-                className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800"
-                placeholder="请输入姓氏"
-                placeholderTextColor="#9ca3af"
-                value={surname}
-                onChangeText={setSurname}
-                maxLength={2}
-              />
-            </View>
+            <Input
+              label="姓氏"
+              placeholder="请输入姓氏"
+              value={surname}
+              onChangeText={setSurname}
+              maxLength={2}
+              icon={<Baby size={20} color={Colors.neutral[400]} />}
+              className="mb-4"
+            />
 
             {/* 性别选择 */}
             <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">性别</Text>
+              <Text className="text-sm font-medium text-neutral-700 mb-3">性别</Text>
               <View className="flex-row gap-3">
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'male' ? 'bg-blue-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('male')}
-                >
-                  <Ionicons
-                    name="male"
-                    size={20}
-                    color={gender === 'male' ? '#fff' : '#6b7280'}
-                  />
-                  <Text
-                    className={`mt-1 ${
-                      gender === 'male' ? 'text-white' : 'text-gray-600'
-                    }`}
-                  >
-                    男宝
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  className={`flex-1 py-3 rounded-xl items-center ${
-                    gender === 'female' ? 'bg-pink-500' : 'bg-gray-100'
-                  }`}
-                  onPress={() => setGender('female')}
-                >
-                  <Ionicons
-                    name="female"
-                    size={20}
-                    color={gender === 'female' ? '#fff' : '#6b7280'}
-                  />
-                  <Text
-                    className={`mt-1 ${
-                      gender === 'female' ? 'text-white' : 'text-gray-600'
-                    }`}
-                  >
-                    女宝
-                  </Text>
-                </TouchableOpacity>
+                <Radio
+                  selected={gender === 'male'}
+                  onSelect={() => setGender('male')}
+                  label="男宝"
+                  className="flex-1"
+                />
+                <Radio
+                  selected={gender === 'female'}
+                  onSelect={() => setGender('female')}
+                  label="女宝"
+                  className="flex-1"
+                />
               </View>
             </View>
 
             {/* 风格选择 */}
-            <View className="mb-4">
-              <Text className="text-gray-600 font-medium mb-2">起名风格</Text>
+            <View className="mb-5">
+              <Text className="text-sm font-medium text-neutral-700 mb-3">起名风格</Text>
               <View className="flex-row gap-2">
                 {styles.map((s) => (
                   <TouchableOpacity
                     key={s.id}
-                    className={`flex-1 py-3 rounded-xl items-center ${
-                      style === s.id ? 'bg-primary-500' : 'bg-gray-100'
+                    className={`flex-1 py-3 px-2 rounded-xl items-center ${
+                      style === s.id ? 'bg-primary-50 border-2 border-primary-400' : 'bg-neutral-100'
                     }`}
                     onPress={() => setStyle(s.id as any)}
                   >
-                    <Ionicons
-                      name={s.icon as any}
-                      size={18}
-                      color={style === s.id ? '#fff' : '#6b7280'}
-                    />
                     <Text
-                      className={`text-xs mt-1 ${
-                        style === s.id ? 'text-white' : 'text-gray-600'
+                      className={`text-xs font-medium ${
+                        style === s.id ? 'text-primary-400' : 'text-neutral-600'
                       }`}
                     >
                       {s.label}
@@ -174,66 +147,60 @@ export default function BabyNamingScreen() {
             </View>
 
             {/* 生成按钮 */}
-            <TouchableOpacity
-              className={`bg-primary-500 py-4 rounded-xl items-center ${
-                isGenerating ? 'opacity-70' : ''
-              }`}
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              loading={isGenerating}
               onPress={handleGenerate}
-              disabled={isGenerating}
+              icon={<Sparkles size={20} color="white" />}
             >
-              {isGenerating ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text className="text-white font-semibold text-lg">开始起名</Text>
-              )}
-            </TouchableOpacity>
-          </View>
+              开始起名
+            </Button>
+          </GradientCard>
 
           {/* 结果列表 */}
           {results.length > 0 && (
-            <View className="mt-6">
-              <Text className="text-lg font-bold text-gray-800 mb-3">推荐好名</Text>
+            <View>
+              <Text className="text-lg font-bold text-neutral-800 mb-3">推荐好名</Text>
               {results.map((result, index) => (
-                <TouchableOpacity
+                <GradientCard
                   key={index}
-                  className="bg-white rounded-xl p-4 mb-3 shadow-sm"
+                  variant="white"
+                  className="p-5 mb-3"
                 >
-                  <View className="flex-row items-center justify-between">
-                    <Text className="text-2xl font-bold text-gray-800">
+                  <View className="flex-row items-center justify-between mb-3">
+                    <Text className="text-2xl font-bold text-neutral-800">
                       {result.name}
                     </Text>
-                    <View className="flex-row items-center">
-                      <Ionicons name="star" size={16} color="#f59e0b" />
-                      <Text className="text-amber-500 font-bold ml-1">
+                    <View className="bg-butter-light px-3 py-1 rounded-full">
+                      <Text className="text-amber-700 font-bold">
                         {result.score}分
                       </Text>
                     </View>
                   </View>
-                  <Text className="text-gray-500 mt-2">{result.meaning}</Text>
-                  <View className="flex-row items-center mt-2">
-                    <View className="bg-secondary-50 px-2 py-1 rounded">
-                      <Text className="text-secondary-600 text-xs">
-                        五行：{result.elements}
-                      </Text>
-                    </View>
+                  <Text className="text-neutral-600 text-base leading-6 mb-3">
+                    {result.meaning}
+                  </Text>
+                  <View className="bg-mint-light px-3 py-1.5 rounded-lg self-start">
+                    <Text className="text-neutral-700 text-sm">
+                      五行：{result.elements}
+                    </Text>
                   </View>
-                </TouchableOpacity>
+                </GradientCard>
               ))}
             </View>
           )}
 
           {/* 提示信息 */}
-          <View className="mt-6 bg-amber-50 rounded-xl p-4">
-            <View className="flex-row items-center">
-              <Ionicons name="bulb-outline" size={20} color="#f59e0b" />
-              <Text className="text-amber-700 font-medium ml-2">温馨提示</Text>
-            </View>
-            <Text className="text-amber-600 text-sm mt-2 leading-5">
+          <GradientCard variant="butter" className="p-4 mt-4">
+            <Text className="text-neutral-800 font-semibold mb-2">💡 温馨提示</Text>
+            <Text className="text-neutral-700 text-sm leading-5">
               起名仅供参考，好名字需结合宝宝的生辰八字、家族辈分等因素综合考虑。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }

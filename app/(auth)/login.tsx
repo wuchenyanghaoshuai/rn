@@ -1,18 +1,26 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 登录页面 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
-  TouchableOpacity,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert,
-  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { User, Lock } from 'lucide-react-native';
 import { useAuthStore } from '../../src/stores/auth';
+import { Button, Input, Divider, GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -34,116 +42,117 @@ export default function LoginScreen() {
 
     try {
       await login({ username: username.trim(), password });
-      router.back();
+      router.replace('/(tabs)');
     } catch (err: any) {
-      Alert.alert('登录失败', err.message || '请检查用户名和密码');
+      // 安全处理：不暴露具体错误，统一提示用户名或密码错误
+      Alert.alert('登录失败', '用户名或密码错误');
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-white"
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    <LinearGradient
+      colors={Gradients.pageBackground}
+      className="flex-1"
     >
-      <ScrollView
+      <KeyboardAvoidingView
         className="flex-1"
-        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}
-        keyboardShouldPersistTaps="handled"
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {/* Logo 区域 */}
-        <View className="items-center mb-10">
-          <View className="w-20 h-20 bg-primary-500 rounded-2xl items-center justify-center mb-4">
-            <Text className="text-white text-3xl font-bold">G</Text>
-          </View>
-          <Text className="text-2xl font-bold text-gray-800">欢迎回来</Text>
-          <Text className="text-gray-400 mt-1">登录您的 GoDad 账号</Text>
-        </View>
-
-        {/* 表单区域 */}
-        <View className="gap-4">
-          {/* 用户名输入 */}
-          <View className="bg-gray-50 rounded-xl flex-row items-center px-4">
-            <Ionicons name="person-outline" size={20} color="#9ca3af" />
-            <TextInput
-              className="flex-1 py-4 px-3 text-base text-gray-800"
-              placeholder="用户名/手机号"
-              placeholderTextColor="#9ca3af"
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-          </View>
-
-          {/* 密码输入 */}
-          <View className="bg-gray-50 rounded-xl flex-row items-center px-4">
-            <Ionicons name="lock-closed-outline" size={20} color="#9ca3af" />
-            <TextInput
-              className="flex-1 py-4 px-3 text-base text-gray-800"
-              placeholder="密码"
-              placeholderTextColor="#9ca3af"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry={!showPassword}
-            />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              <Ionicons
-                name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                size={20}
-                color="#9ca3af"
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Logo 区域 */}
+          <View className="items-center mb-8">
+            <View
+              className="w-36 h-36 rounded-3xl bg-white items-center justify-center mb-4"
+              style={{ shadowColor: '#e76f51', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 10 }}
+            >
+              <Image
+                source={require('../../assets/logo.png')}
+                className="w-32 h-32"
+                resizeMode="contain"
               />
+            </View>
+            <Text className="text-3xl font-bold text-neutral-800">欢迎回来</Text>
+            <Text className="text-neutral-500 mt-2 text-base">登录您的 GoDad 账号</Text>
+          </View>
+
+          {/* 表单卡片 */}
+          <GradientCard variant="white" className="p-6">
+            <View className="gap-4">
+              {/* 用户名输入 */}
+              <Input
+                placeholder="用户名/手机号"
+                value={username}
+                onChangeText={setUsername}
+                autoCapitalize="none"
+                autoCorrect={false}
+                icon={<User size={20} color={Colors.neutral[400]} />}
+              />
+
+              {/* 密码输入 */}
+              <Input
+                placeholder="密码"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                icon={<Lock size={20} color={Colors.neutral[400]} />}
+              />
+
+              {/* 忘记密码 */}
+              <TouchableOpacity
+                className="self-end"
+                onPress={() => router.push('/(auth)/forgot-password')}
+              >
+                <Text className="text-primary-400 font-medium">忘记密码？</Text>
+              </TouchableOpacity>
+
+              {/* 登录按钮 */}
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={isLoading}
+                onPress={handleLogin}
+                className="mt-2"
+              >
+                登录
+              </Button>
+            </View>
+          </GradientCard>
+
+          {/* 分割线 */}
+          <View className="my-8">
+            <Divider text="或" />
+          </View>
+
+          {/* 第三方登录 */}
+          <View className="flex-row justify-center gap-4">
+            <TouchableOpacity
+              className="w-14 h-14 bg-green-500 rounded-2xl items-center justify-center"
+              style={{ shadowColor: '#22c55e', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 }}
+            >
+              <Text className="text-white text-2xl">微</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="w-14 h-14 bg-blue-500 rounded-2xl items-center justify-center"
+              style={{ shadowColor: '#3b82f6', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, elevation: 4 }}
+            >
+              <Text className="text-white text-2xl">📱</Text>
             </TouchableOpacity>
           </View>
 
-          {/* 忘记密码 */}
-          <TouchableOpacity
-            className="self-end"
-            onPress={() => router.push('/(auth)/forgot-password')}
-          >
-            <Text className="text-primary-500">忘记密码？</Text>
-          </TouchableOpacity>
-
-          {/* 登录按钮 */}
-          <TouchableOpacity
-            className={`bg-primary-500 rounded-xl py-4 items-center mt-4 ${
-              isLoading ? 'opacity-70' : ''
-            }`}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            {isLoading ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text className="text-white text-lg font-semibold">登录</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {/* 分割线 */}
-        <View className="flex-row items-center my-8">
-          <View className="flex-1 h-px bg-gray-200" />
-          <Text className="text-gray-400 mx-4">或</Text>
-          <View className="flex-1 h-px bg-gray-200" />
-        </View>
-
-        {/* 第三方登录 */}
-        <View className="flex-row justify-center gap-6">
-          <TouchableOpacity className="w-12 h-12 bg-green-500 rounded-full items-center justify-center">
-            <Ionicons name="logo-wechat" size={24} color="#fff" />
-          </TouchableOpacity>
-          <TouchableOpacity className="w-12 h-12 bg-blue-500 rounded-full items-center justify-center">
-            <Ionicons name="phone-portrait-outline" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* 注册入口 */}
-        <View className="flex-row justify-center mt-8">
-          <Text className="text-gray-400">还没有账号？</Text>
-          <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-            <Text className="text-primary-500 font-medium ml-1">立即注册</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* 注册入口 */}
+          <View className="flex-row justify-center mt-8">
+            <Text className="text-neutral-600 text-base">还没有账号？</Text>
+            <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+              <Text className="text-primary-400 font-semibold ml-1 text-base">立即注册</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 }

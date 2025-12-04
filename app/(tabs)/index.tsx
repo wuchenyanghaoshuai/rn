@@ -1,8 +1,15 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 首页 - 方案A设计系统重构版
+ */
+
 import { View, Text, ScrollView, RefreshControl, Image, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useQuery } from '@tanstack/react-query';
 import { useState, useCallback } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { Search } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { articleApi } from '../../src/api/article';
@@ -11,6 +18,7 @@ import { useAuthStore } from '../../src/stores/auth';
 import ArticleCard from '../../src/components/ArticleCard';
 import LoadingSpinner from '../../src/components/LoadingSpinner';
 import { SkeletonLoader } from '../../src/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
@@ -31,10 +39,10 @@ interface QuickTool {
 }
 
 const QUICK_TOOLS: QuickTool[] = [
-  { id: 'baby-naming', name: '宝宝起名', icon: 'sparkles-outline', color: '#e76f51', route: '/tools/baby-naming' },
-  { id: 'height-prediction', name: '身高预测', icon: 'trending-up-outline', color: '#14b8a6', route: '/tools/height-prediction' },
-  { id: 'vaccine-schedule', name: '疫苗日程', icon: 'medkit-outline', color: '#ef4444', route: '/tools/vaccine-schedule' },
-  { id: 'more', name: '更多工具', icon: 'grid-outline', color: '#6b7280', route: '/tools' },
+  { id: 'baby-naming', name: '宝宝起名', icon: 'sparkles-outline', color: Colors.primary[400], route: '/tools/baby-naming' },
+  { id: 'height-prediction', name: '身高预测', icon: 'trending-up-outline', color: Colors.mint.DEFAULT, route: '/tools/height-prediction' },
+  { id: 'vaccine-schedule', name: '疫苗日程', icon: 'medkit-outline', color: Colors.rose.DEFAULT, route: '/tools/vaccine-schedule' },
+  { id: 'more', name: '更多工具', icon: 'grid-outline', color: Colors.lavender.DEFAULT, route: '/tools' },
 ];
 
 // 工具快捷入口卡片组件 (需要在 HomeScreen 之前定义以避免 Hermes 提升问题)
@@ -117,9 +125,9 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* 顶部渐变背景 */}
+      {/* 顶部渐变背景 - 方案A柔和粉彩 */}
       <LinearGradient
-        colors={['#fdf2f8', '#fce7f3', '#ffffff']}
+        colors={Gradients.pageBackground}
         style={styles.headerGradient}
       />
 
@@ -131,8 +139,8 @@ export default function HomeScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#ec4899']}
-            tintColor="#ec4899"
+            colors={[Colors.primary[400]]}
+            tintColor={Colors.primary[400]}
           />
         }
       >
@@ -148,8 +156,8 @@ export default function HomeScreen() {
               searchScale.value = withSpring(1, { damping: 15, stiffness: 400 });
             }}
           >
-            <LinearGradient colors={['#ec4899', '#db2777']} style={styles.searchIcon}>
-              <Ionicons name="search" size={16} color="#fff" />
+            <LinearGradient colors={Gradients.primary} style={styles.searchIcon}>
+              <Search size={16} color="#fff" />
             </LinearGradient>
             <Text style={styles.searchPlaceholder}>搜索文章、用户...</Text>
           </Pressable>
@@ -180,7 +188,7 @@ export default function HomeScreen() {
             </View>
             <Pressable onPress={() => router.push('/tools')} style={styles.moreButton}>
               <Text style={styles.moreText}>查看全部</Text>
-              <Ionicons name="chevron-forward" size={14} color="#ec4899" />
+              <Ionicons name="chevron-forward" size={14} color="#FF9B8A" />
             </Pressable>
           </View>
 
@@ -199,14 +207,14 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <LinearGradient colors={['#ec4899', '#f472b6']} style={styles.sectionIconBg}>
+              <LinearGradient colors={['#FF9B8A', '#f472b6']} style={styles.sectionIconBg}>
                 <Ionicons name="flame" size={14} color="#fff" />
               </LinearGradient>
               <Text style={styles.sectionTitle}>热门文章</Text>
             </View>
             <Pressable onPress={() => router.push('/articles')} style={styles.moreButton}>
               <Text style={styles.moreText}>查看更多</Text>
-              <Ionicons name="chevron-forward" size={14} color="#ec4899" />
+              <Ionicons name="chevron-forward" size={14} color="#FF9B8A" />
             </Pressable>
           </View>
 
@@ -261,7 +269,7 @@ export default function HomeScreen() {
                   onPress={() => router.push('/(auth)/login')}
                   style={({ pressed }) => [styles.loginButton, pressed && styles.loginButtonPressed]}
                 >
-                  <LinearGradient colors={['#ec4899', '#db2777']} style={styles.loginButtonGradient}>
+                  <LinearGradient colors={['#FF9B8A', '#db2777']} style={styles.loginButtonGradient}>
                     <Text style={styles.loginButtonText}>立即登录</Text>
                   </LinearGradient>
                 </Pressable>
@@ -291,7 +299,7 @@ function CategoryCard({ category, index, router }: { category: any; index: numbe
     ['#f0fdf4', '#dcfce7'], // green
     ['#fef7f0', '#fef3c7'], // warm
   ];
-  const iconColors = ['#ec4899', '#0ea5e9', '#22c55e', '#f59e0b'];
+  const iconColors = ['#FF9B8A', '#0ea5e9', '#22c55e', '#f59e0b'];
   const colorIndex = index % 4;
 
   return (
@@ -518,7 +526,7 @@ const styles = StyleSheet.create({
   },
   moreText: {
     fontSize: 14,
-    color: '#ec4899',
+    color: '#FF9B8A',
     fontWeight: '500',
   },
   hotList: {

@@ -1,13 +1,21 @@
+/**
+ * @author wanglezhi
+ * @date 2025-11-28
+ * @description 五行查询工具 - 方案A设计系统重构版
+ */
+
 import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Search, ArrowRight, X } from 'lucide-react-native';
+import { Input, Button, GradientCard } from '@/components/ui';
+import { Gradients, Colors } from '@/constants/colors';
 
 interface CharacterAnalysis {
   char: string;
@@ -119,41 +127,51 @@ export default function FiveElementsQueryScreen() {
   };
 
   return (
-    <>
-      <Stack.Screen options={{ title: '五行查询' }} />
+    <LinearGradient colors={Gradients.pageBackground} className="flex-1">
+      <Stack.Screen
+        options={{
+          title: '五行查询',
+          headerStyle: { backgroundColor: 'transparent' },
+        }}
+      />
 
-      <ScrollView className="flex-1 bg-background">
-        <View className="p-4">
+      <ScrollView className="flex-1">
+        <View className="p-5">
           {/* 介绍 */}
-          <View className="bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl p-5 mb-4">
-            <Text className="text-white text-lg font-bold">汉字五行查询</Text>
-            <Text className="text-white/80 mt-2 leading-5">
+          <GradientCard variant="sky" className="p-5 mb-5">
+            <View className="flex-row items-center mb-2">
+              <Search size={24} color={Colors.neutral[700]} />
+              <Text className="text-neutral-800 text-lg font-bold ml-2">汉字五行查询</Text>
+            </View>
+            <Text className="text-neutral-700 leading-5">
               输入汉字查询其五行属性，了解字义背后的五行能量。
             </Text>
-          </View>
+          </GradientCard>
 
           {/* 输入区域 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <TextInput
-              className="bg-gray-50 rounded-xl px-4 py-3 text-gray-800 text-lg"
+          <GradientCard variant="white" className="p-5 mb-5">
+            <Input
               placeholder="输入要查询的汉字"
-              placeholderTextColor="#9ca3af"
               value={inputText}
               onChangeText={setInputText}
               maxLength={10}
+              className="mb-4 text-lg"
             />
-            <TouchableOpacity
-              className="bg-primary-500 py-4 rounded-xl items-center mt-3"
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
               onPress={analyze}
+              icon={<Search size={20} color="white" />}
             >
-              <Text className="text-white font-semibold text-lg">查询五行</Text>
-            </TouchableOpacity>
-          </View>
+              查询五行
+            </Button>
+          </GradientCard>
 
           {/* 查询结果 */}
           {results.length > 0 && (
-            <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-              <Text className="text-gray-800 font-bold mb-4">查询结果</Text>
+            <GradientCard variant="white" className="p-5 mb-5">
+              <Text className="text-neutral-800 font-bold text-base mb-4">查询结果</Text>
               <View className="flex-row flex-wrap gap-3">
                 {results.map((result, index) => {
                   const info = elementInfo[result.element as keyof typeof elementInfo];
@@ -172,24 +190,24 @@ export default function FiveElementsQueryScreen() {
                       >
                         {result.element}
                       </Text>
-                      <Text className="text-gray-500 text-sm mt-1">
+                      <Text className="text-neutral-600 text-sm mt-1">
                         约{result.strokes}画
                       </Text>
                     </View>
                   );
                 })}
               </View>
-            </View>
+            </GradientCard>
           )}
 
           {/* 五行详解 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-4">五行详解</Text>
+          <GradientCard variant="lavender" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-4">五行详解</Text>
             <View className="gap-4">
               {Object.entries(elementInfo).map(([element, info]) => (
-                <TouchableOpacity
+                <View
                   key={element}
-                  className="border-l-4 pl-3 py-2"
+                  className="border-l-4 pl-3 py-2 bg-white/40 rounded-r-xl"
                   style={{ borderColor: info.color }}
                 >
                   <View className="flex-row items-center">
@@ -201,50 +219,52 @@ export default function FiveElementsQueryScreen() {
                         {element}
                       </Text>
                     </View>
-                    <Text className="text-gray-800 font-medium ml-2">
+                    <Text className="text-neutral-800 font-medium ml-2 flex-1">
                       {info.description}
                     </Text>
                   </View>
-                  <View className="flex-row flex-wrap gap-1 mt-2">
+                  <View className="flex-row flex-wrap gap-1.5 mt-2">
                     {info.characteristics.map((char, idx) => (
                       <Text
                         key={idx}
-                        className="text-xs px-2 py-0.5 rounded"
+                        className="text-xs px-2 py-1 rounded-lg font-medium"
                         style={{ backgroundColor: info.bgColor, color: info.color }}
                       >
                         {char}
                       </Text>
                     ))}
                   </View>
-                </TouchableOpacity>
+                </View>
               ))}
             </View>
-          </View>
+          </GradientCard>
 
           {/* 五行相生相克 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm mb-4">
-            <Text className="text-gray-800 font-bold mb-3">五行相生相克</Text>
-            <View className="bg-gray-50 rounded-xl p-4">
-              <View className="flex-row items-center mb-2">
-                <Ionicons name="arrow-forward-circle-outline" size={18} color="#22c55e" />
-                <Text className="text-green-600 ml-2">
-                  相生：金生水 → 水生木 → 木生火 → 火生土 → 土生金
+          <GradientCard variant="mint" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-3">五行相生相克</Text>
+            <View className="bg-white/60 rounded-xl p-4">
+              <View className="flex-row items-center mb-3">
+                <ArrowRight size={18} color={Colors.mint.DEFAULT} />
+                <Text className="text-neutral-800 ml-2 flex-1 leading-6">
+                  <Text className="font-semibold">相生：</Text>
+                  金生水 → 水生木 → 木生火 → 火生土 → 土生金
                 </Text>
               </View>
               <View className="flex-row items-center">
-                <Ionicons name="close-circle-outline" size={18} color="#ef4444" />
-                <Text className="text-red-500 ml-2">
-                  相克：金克木 → 木克土 → 土克水 → 水克火 → 火克金
+                <X size={18} color={Colors.rose.DEFAULT} />
+                <Text className="text-neutral-800 ml-2 flex-1 leading-6">
+                  <Text className="font-semibold">相克：</Text>
+                  金克木 → 木克土 → 土克水 → 水克火 → 火克金
                 </Text>
               </View>
             </View>
-          </View>
+          </GradientCard>
 
           {/* 常用五行字推荐 */}
-          <View className="bg-white rounded-2xl p-4 shadow-sm">
-            <Text className="text-gray-800 font-bold mb-4">常用五行字</Text>
+          <GradientCard variant="white" className="p-5 mb-5">
+            <Text className="text-neutral-800 font-bold text-base mb-4">常用五行字</Text>
             {Object.entries(elementInfo).map(([element, info]) => (
-              <View key={element} className="mb-3">
+              <View key={element} className="mb-4 last:mb-0">
                 <View className="flex-row items-center mb-2">
                   <View
                     className="w-6 h-6 rounded-full items-center justify-center"
@@ -254,7 +274,7 @@ export default function FiveElementsQueryScreen() {
                       {element}
                     </Text>
                   </View>
-                  <Text className="text-gray-700 font-medium ml-2">属{element}的字</Text>
+                  <Text className="text-neutral-700 font-medium ml-2">属{element}的字</Text>
                 </View>
                 <View className="flex-row flex-wrap gap-2">
                   {info.sampleChars.map((char, idx) => (
@@ -272,17 +292,17 @@ export default function FiveElementsQueryScreen() {
                 </View>
               </View>
             ))}
-          </View>
+          </GradientCard>
 
           {/* 提示 */}
-          <View className="mt-4 bg-gray-50 rounded-xl p-4">
-            <Text className="text-gray-500 text-sm leading-5">
+          <GradientCard variant="butter" className="p-4">
+            <Text className="text-neutral-700 text-sm leading-5">
               * 汉字五行的判断方法有多种，包括字形、字义、读音等，
               本工具仅供参考，不同资料可能有不同的划分。
             </Text>
-          </View>
+          </GradientCard>
         </View>
       </ScrollView>
-    </>
+    </LinearGradient>
   );
 }
